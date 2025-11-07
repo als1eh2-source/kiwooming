@@ -12,9 +12,28 @@ import Order from './pages/Order';
 import Chart from './pages/Chart';
 import Account from './pages/Account';
 
+import { FloatingChatbot } from "./components/FloatingChatBot";
+
+
 export default function App() {
   return (
+        <div
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        backgroundColor: "#F9FAFB",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        paddingTop: "20px",
+        paddingBottom: "90px",
+        position: "relative",
+        overflowX: "hidden",
+      }}
+    >
     <BrowserRouter>
+    <FloatingChatbot />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
@@ -27,5 +46,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </div>
   );
 }
