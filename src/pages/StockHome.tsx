@@ -5,6 +5,13 @@ import { StockSearchBar } from "../components/StockHome/StockSearchBar";
 import { StockSummaryCard } from "../components/StockHome/StockSummaryCard";
 import { StockInfoTabs } from "../components/StockHome/StockInfoTabs";
 import { StockCompanyInfoCard } from "../components/StockHome/StockCompInfoCard";
+import { StockTalkCard } from "../components/StockHome/StockTalkCard";
+import { RelatedThemeCard } from "../components/StockHome/RelatedThemeCard";
+import { KiwoomInsightCard } from "../components/StockHome/InsightCard";
+import { DailyFlowCard } from "../components/StockHome/DailyFlowCard";
+import { PerformanceCard } from "../components/StockHome/PerformanceCard";
+import { DomesticInvestmentCard } from "../components/StockHome/DomesticInvestmentCard";
+import { StockNewsCard } from "../components/StockHome/StockNewsCard";
 
 
 export default function StockHome() {
@@ -14,5 +21,12 @@ export default function StockHome() {
     <StockSummaryCard/>
     <StockInfoTabs/>
     <StockCompanyInfoCard/>
+    <StockTalkCard/>
+    <RelatedThemeCard/>
+    <KiwoomInsightCard/>
+    <DailyFlowCard/>
+    <PerformanceCard/>
+    <StockNewsCard/>
+    <DomesticInvestmentCard/>
   </div>;
 }

@@ -20,7 +20,7 @@ export default function Home() {
         backgroundColor: "#F9FAFB",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",   // 🔹 가로 중앙 정렬 핵심
+        alignItems: "center",   // 가로 중앙 정렬 핵심
         justifyContent: "flex-start", // 위에서부터 쌓이도록
         paddingTop: "20px",
         paddingBottom: "90px", // 하단바 안 겹치게 여백 확보
