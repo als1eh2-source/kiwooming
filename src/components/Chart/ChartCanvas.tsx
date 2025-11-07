@@ -181,19 +181,6 @@ export const ChartCanvas: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Index Info */}
-      <div style={styles.indexBar}>
-        <span style={styles.indexName}>코스피</span>
-        <span style={styles.indexValue}>4,004.42</span>
-        <div style={styles.indexChange}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M7 14L12 9L17 14" stroke="#2196F3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span style={styles.indexChangeValue}>117.32</span>
-        </div>
-        <span style={styles.indexPercent}>2.85%</span>
-      </div>
     </div>
   );
 };
@@ -332,34 +319,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '100%',
     gap: '2px',
     paddingRight: '60px',
-  },
-  indexBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    backgroundColor: '#f5f5f5',
-    borderTop: '1px solid #e0e0e0',
-  },
-  indexName: {
-    fontSize: '13px',
-    color: '#000',
-  },
-  indexValue: {
-    fontSize: '14px',
-    color: '#2196F3',
-  },
-  indexChange: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  indexChangeValue: {
-    fontSize: '13px',
-    color: '#2196F3',
-  },
-  indexPercent: {
-    fontSize: '13px',
-    color: '#2196F3',
   },
 };

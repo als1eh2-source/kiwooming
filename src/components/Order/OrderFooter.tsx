@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ChartFooter: React.FC = () => {
+export const OrderFooter: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('계좌');
 
   const tabs = [

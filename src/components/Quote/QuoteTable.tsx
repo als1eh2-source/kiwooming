@@ -1,32 +1,32 @@
 import React from 'react';
 
 interface OrderBookRow {
-  bidQty: number;
-  bidPrice: number;
   askQty: number;
-  askPrice: number;
+  price: number;
+  bidQty: number;
 }
 
 const dummyOrderBook: OrderBookRow[] = [
-  { bidQty: 236, bidPrice: 0, askQty: 0, askPrice: 285500 },
-  { bidQty: 189, bidPrice: 0, askQty: 0, askPrice: 285000 },
-  { bidQty: 111, bidPrice: 0, askQty: 0, askPrice: 284500 },
-  { bidQty: 13, bidPrice: 0, askQty: 0, askPrice: 284000 },
-  { bidQty: 46, bidPrice: 0, askQty: 0, askPrice: 283500 },
-  { bidQty: 130, bidPrice: 0, askQty: 0, askPrice: 283000 },
-  { bidQty: 391, bidPrice: 0, askQty: 0, askPrice: 282500 },
-  { bidQty: 55, bidPrice: 282000, askQty: 0, askPrice: 0 }, // Current price
-  { bidQty: 0, bidPrice: 281500, askQty: 65, askPrice: 0 },
-  { bidQty: 0, bidPrice: 281000, askQty: 110, askPrice: 0 },
-  { bidQty: 0, bidPrice: 280500, askQty: 194, askPrice: 0 },
-  { bidQty: 0, bidPrice: 280000, askQty: 170, askPrice: 0 },
-  { bidQty: 0, bidPrice: 279500, askQty: 139, askPrice: 0 },
+  { askQty: 236, price: 285500, bidQty: 0 },
+  { askQty: 189, price: 285000, bidQty: 0 },
+  { askQty: 111, price: 284500, bidQty: 0 },
+  { askQty: 13, price: 284000, bidQty: 0 },
+  { askQty: 46, price: 283500, bidQty: 0 },
+  { askQty: 130, price: 283000, bidQty: 0 },
+  { askQty: 391, price: 282500, bidQty: 0 },
+  { askQty: 55, price: 282000, bidQty: 0 }, // Current price
+  { askQty: 0, price: 281500, bidQty: 65 },
+  { askQty: 0, price: 281000, bidQty: 110 },
+  { askQty: 0, price: 280500, bidQty: 194 },
+  { askQty: 0, price: 280000, bidQty: 170 },
+  { askQty: 0, price: 279500, bidQty: 139 },
+  { askQty: 0, price: 279000, bidQty: 73 },
 ];
 
 const priceMetrics = [
-  { label: '매입등락', value: '-2.75%' },
-  { label: '매입가격', value: '282,500' },
-  { label: '매입수량', value: '233' },
+  { label: '예동등락', value: '-2.75%' },
+  { label: '예수가격', value: '282,500' },
+  { label: '예수수량', value: '233' },
   { label: '전일거래', value: '218,766' },
   { label: '거래량', value: '215,623' },
   { label: '전일비', value: '98.56%' },
@@ -39,96 +39,105 @@ const priceMetrics = [
   { label: '거래비중', value: '509' },
 ];
 
+const executionData = [
+  { price: '282,000', qty: 1 },
+  { price: '281,500', qty: 1 },
+  { price: '281,500', qty: 1 },
+  { price: '281,500', qty: 20 },
+  { price: '281,500', qty: 5, badge: '시' },
+  { price: '281,500', qty: 10 },
+  { price: '282,000', qty: 3 },
+  { price: '281,500', qty: 4 },
+];
+
 export const QuoteTable: React.FC = () => {
   return (
     <div style={styles.container}>
-      {/* Main Order Book */}
+      {/* Main Order Book Grid */}
       <div style={styles.orderBookGrid}>
-        {/* Left side - Bid info columns */}
-        <div style={styles.leftMetrics}>
-          {priceMetrics.map((metric, index) => (
-            <div key={index} style={styles.metricRow}>
-              <span style={styles.metricLabel}>{metric.label}</span>
-              <span style={styles.metricValue}>{metric.value}</span>
+        {/* Left Column - Ask Quantities (Diagonal Top) + Execution Data (Diagonal Bottom) */}
+        <div style={styles.leftColumn}>
+          {/* Top section - Ask quantities */}
+          <div style={styles.askQtySection}>
+            {dummyOrderBook.slice(0, 8).map((row, index) => (
+              <div key={index} style={styles.qtyRow}>
+                {row.askQty > 0 && (
+                  <>
+                    <span style={styles.askQty}>{row.askQty}</span>
+                    {index === 6 && <span style={styles.totalBadge}>총</span>}
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom section - Execution strength and data */}
+          <div style={styles.executionSection}>
+            <div style={styles.executionHeader}>
+              <span style={styles.executionLabel}>체결강도</span>
+              <span style={styles.executionValue}>105.70%</span>
             </div>
-          ))}
+            
+            {executionData.map((item, index) => (
+              <div key={index} style={styles.executionRow}>
+                <span style={styles.executionPrice}>{item.price}</span>
+                <span style={styles.executionQty}>{item.qty}</span>
+                {item.badge && <span style={styles.executionBadge}>{item.badge}</span>}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Center - Order Book */}
-        <div style={styles.orderBook}>
+        {/* Center Column - Prices */}
+        <div style={styles.centerColumn}>
           {dummyOrderBook.map((row, index) => {
-            const isCurrentPrice = row.bidPrice === 282000;
-            const isBid = row.bidPrice > 0;
-            const isAsk = row.askPrice > 0;
+            const isCurrentPrice = row.price === 282000;
+            const isAsk = row.askQty > 0;
+            const isBid = row.bidQty > 0;
 
             return (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 style={{
-                  ...styles.orderRow,
+                  ...styles.priceRow,
                   ...(isCurrentPrice ? styles.currentPriceRow : {}),
-                  ...(isBid && !isCurrentPrice ? styles.bidRow : {}),
-                  ...(isAsk ? styles.askRow : {}),
+                  ...(isAsk && !isCurrentPrice ? styles.askPriceRow : {}),
+                  ...(isBid ? styles.bidPriceRow : {}),
                 }}
               >
-                {/* Bid quantity */}
-                <div style={styles.qtyCell}>
-                  {row.bidQty > 0 && (
-                    <span style={styles.bidQty}>{row.bidQty}</span>
-                  )}
-                </div>
-
-                {/* Price */}
-                <div style={styles.priceCell}>
-                  {isBid && (
-                    <span style={isCurrentPrice ? styles.currentPrice : styles.bidPrice}>
-                      {row.bidPrice.toLocaleString()}
-                    </span>
-                  )}
-                  {isAsk && (
-                    <span style={styles.askPrice}>
-                      {row.askPrice.toLocaleString()}
-                    </span>
-                  )}
-                  {isCurrentPrice && (
-                    <span style={styles.indicatorDot}>●</span>
-                  )}
-                </div>
-
-                {/* Ask quantity */}
-                <div style={styles.qtyCell}>
-                  {row.askQty > 0 && (
-                    <span style={styles.askQty}>{row.askQty}</span>
-                  )}
-                  {index === 6 && row.askQty === 0 && (
-                    <span style={styles.totalBadge}>총</span>
-                  )}
-                </div>
+                <span
+                  style={{
+                    ...styles.priceText,
+                    ...(isCurrentPrice ? styles.currentPriceText : {}),
+                    ...(isAsk && !isCurrentPrice ? styles.askPriceText : {}),
+                  }}
+                >
+                  {row.price.toLocaleString()}
+                </span>
               </div>
             );
           })}
+        </div>
 
-          {/* Volume Summary Rows */}
-          <div style={styles.volumeRows}>
-            <div style={styles.volumeRow}>
-              <span style={styles.volumeLabel}>체결강도</span>
-              <span style={styles.volumeValueRed}>105.70%</span>
-            </div>
-            
-            {[
-              { price: '282,000', qty: 1 },
-              { price: '281,500', qty: 1 },
-              { price: '281,500', qty: 1 },
-              { price: '281,500', qty: 20 },
-              { price: '281,500', qty: 5, badge: '시' },
-              { price: '281,500', qty: 10 },
-              { price: '282,000', qty: 3 },
-              { price: '281,500', qty: 4 },
-            ].map((item, index) => (
-              <div key={index} style={styles.volumeDetailRow}>
-                <span style={styles.volumePrice}>{item.price}</span>
-                <span style={styles.volumeQty}>{item.qty}</span>
-                {item.badge && <span style={styles.volumeBadge}>{item.badge}</span>}
+        {/* Right Column - Price Metrics (Diagonal Top) + Bid Quantities (Diagonal Bottom) */}
+        <div style={styles.rightColumn}>
+          {/* Top section - Price metrics */}
+          <div style={styles.metricsSection}>
+            {priceMetrics.map((metric, index) => (
+              <div key={index} style={styles.metricRow}>
+                <span style={styles.metricLabel}>{metric.label}</span>
+                <span style={styles.metricValue}>{metric.value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom section - Bid quantities */}
+          <div style={styles.bidQtySection}>
+            {dummyOrderBook.slice(8).map((row, index) => (
+              <div key={index} style={styles.qtyRow}>
+                {row.bidQty > 0 && (
+                  <span style={styles.bidQty}>{row.bidQty}</span>
+                )}
               </div>
             ))}
           </div>
@@ -176,12 +185,108 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflow: 'auto',
   },
   orderBookGrid: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '90px 1fr 140px',
     minHeight: '600px',
   },
-  leftMetrics: {
-    width: '140px',
+  
+  // Left Column Styles
+  leftColumn: {
     borderRight: '1px solid #e0e0e0',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  askQtySection: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+  },
+  executionSection: {
+    padding: '8px',
+    backgroundColor: '#f9f9f9',
+    borderTop: '1px solid #e0e0e0',
+  },
+  executionHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '6px 0',
+    marginBottom: '4px',
+  },
+  executionLabel: {
+    fontSize: '11px',
+    color: '#666',
+  },
+  executionValue: {
+    fontSize: '12px',
+    color: '#ff4444',
+  },
+  executionRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '3px 0',
+    gap: '4px',
+  },
+  executionPrice: {
+    fontSize: '11px',
+    color: '#000',
+    flex: 1,
+  },
+  executionQty: {
+    fontSize: '11px',
+    color: '#2196F3',
+  },
+  executionBadge: {
+    fontSize: '10px',
+    color: '#666',
+  },
+  
+  // Center Column Styles
+  centerColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderRight: '1px solid #e0e0e0',
+  },
+  priceRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '8px 12px',
+    borderBottom: '1px solid #f5f5f5',
+    minHeight: '36px',
+  },
+  currentPriceRow: {
+    backgroundColor: '#fff',
+    border: '2px solid #ff4444',
+    borderLeft: 'none',
+    borderRight: 'none',
+  },
+  askPriceRow: {
+    backgroundColor: 'rgba(227, 242, 253, 0.3)',
+  },
+  bidPriceRow: {
+    backgroundColor: 'rgba(255, 235, 238, 0.15)',
+  },
+  priceText: {
+    fontSize: '16px',
+    color: '#000',
+  },
+  currentPriceText: {
+    fontSize: '16px',
+    color: '#ff4444',
+  },
+  askPriceText: {
+    fontSize: '16px',
+    color: '#2196F3',
+  },
+  
+  // Right Column Styles
+  rightColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  metricsSection: {
     padding: '4px 8px',
     display: 'flex',
     flexDirection: 'column',
@@ -190,117 +295,48 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '8px 4px',
+    padding: '6px 4px',
     borderBottom: '1px solid #f5f5f5',
+    minHeight: '36px',
   },
   metricLabel: {
     fontSize: '11px',
     color: '#666',
   },
   metricValue: {
-    fontSize: '12px',
+    fontSize: '11px',
     color: '#000',
   },
-  orderBook: {
-    flex: 1,
+  bidQtySection: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  orderRow: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '6px 8px',
-    borderBottom: '1px solid #f5f5f5',
-  },
-  currentPriceRow: {
     backgroundColor: '#fff',
-    border: '1px solid #ff4444',
   },
-  bidRow: {
-    backgroundColor: 'rgba(255, 235, 238, 0.3)',
-  },
-  askRow: {
-    backgroundColor: 'rgba(227, 242, 253, 0.3)',
-  },
-  qtyCell: {
-    width: '50px',
-    textAlign: 'center',
-  },
-  priceCell: {
-    flex: 1,
-    textAlign: 'center',
+  
+  // Quantity Styles
+  qtyRow: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
-  },
-  bidQty: {
-    fontSize: '13px',
-    color: '#000',
+    padding: '8px 12px',
+    borderBottom: '1px solid #f5f5f5',
+    minHeight: '36px',
+    gap: '6px',
   },
   askQty: {
-    fontSize: '13px',
+    fontSize: '14px',
     color: '#000',
   },
-  bidPrice: {
-    fontSize: '15px',
+  bidQty: {
+    fontSize: '14px',
     color: '#000',
-  },
-  askPrice: {
-    fontSize: '15px',
-    color: '#2196F3',
-  },
-  currentPrice: {
-    fontSize: '15px',
-    color: '#ff4444',
-  },
-  indicatorDot: {
-    color: '#ff4444',
-    fontSize: '8px',
   },
   totalBadge: {
     fontSize: '11px',
     color: '#666',
   },
-  volumeRows: {
-    padding: '8px',
-    backgroundColor: '#f9f9f9',
-    borderTop: '1px solid #e0e0e0',
-  },
-  volumeRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '6px 0',
-  },
-  volumeLabel: {
-    fontSize: '12px',
-    color: '#666',
-  },
-  volumeValueRed: {
-    fontSize: '13px',
-    color: '#ff4444',
-  },
-  volumeDetailRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '4px 0',
-    gap: '8px',
-  },
-  volumePrice: {
-    fontSize: '12px',
-    color: '#000',
-    flex: 1,
-  },
-  volumeQty: {
-    fontSize: '12px',
-    color: '#2196F3',
-  },
-  volumeBadge: {
-    fontSize: '11px',
-    color: '#666',
-  },
+  
+  // Bottom Summary Styles
   bottomSummary: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -331,6 +367,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
+  // Index Bar Styles
   indexBar: {
     display: 'flex',
     alignItems: 'center',
@@ -360,4 +398,3 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#2196F3',
   },
 };
-
