@@ -1,8 +1,8 @@
 import React from 'react';
 import Slider from 'react-slick';
-import 'react-slick/slick/slick.css';
-import 'react-slick/slick/slick-theme.css';
-import exampleImage from 'figma:asset/471ce1761939d4dfce357e41f6b07a7c080d30b7.png';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import exampleImage from '../img/exampleImage.png';
 
 /**
  * DomesticInvestmentCard Component
