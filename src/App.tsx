@@ -5,6 +5,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Home from './pages/Home';
+import Search from './pages/Search';
 import StockHome from './pages/StockHome';
 import Quote from './pages/Quote';
 import Order from './pages/Order';
@@ -16,6 +17,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/stocks" element={<StockHome />} />
         <Route path="/quote" element={<Quote />} />
         <Route path="/quote/:symbol" element={<Quote />} />
