@@ -16,8 +16,10 @@ import { StockNewsCard } from "../components/StockHome/StockNewsCard";
 
 export default function StockHome() {
   return <div>
+    {/* 상단 */}
     <StockHeaderBar/>
     <StockSearchBar/>
+    
     <StockSummaryCard/>
     <StockInfoTabs/>
     <StockCompanyInfoCard/>
