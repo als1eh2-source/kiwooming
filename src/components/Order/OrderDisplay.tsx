@@ -1,47 +1,70 @@
 import React from 'react';
 
 export const OrderDisplay: React.FC = () => {
+  const [pin, setPin] = React.useState('');
+  const [showPad, setShowPad] = React.useState(false);
+
+  const handlePadClick = (key: string) => {
+    if (key === '⌫') {
+      setPin((p) => p.slice(0, -1));
+      return;
+    }
+    if (key === '확인') {
+      setShowPad(false);
+      return;
+    }
+    if (/^\d$/.test(key) && pin.length < 4) {
+      setPin((p) => p + key);
+    }
+  };
+
+  const closePad = () => setShowPad(false);
+
   return (
     <div style={styles.container}>
-      {/* Stock Selector */}
-      <div style={styles.stockSelector}>
-        <div style={styles.stockLeft}>
-          <div style={styles.favoriteIcon}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
-            </svg>
-          </div>
-          
-          <div style={styles.stockInfo}>
-            <span style={styles.stockName}>키움증권</span>
-            <div style={styles.stockDetails}>
-              <span style={styles.badgeGreen}>상장</span>
-              <span style={styles.stockCode}>039490 NXT거래가능</span>
+      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
+      <div style={styles.selectorRow}>
+        <div style={styles.selectorGroup}>
+          <div style={styles.selectorBox}>
+            <div style={styles.selectorLeft}>
+              <div style={styles.favoriteIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
+                </svg>
+              </div>
+              <div style={styles.stockInfo}>
+                <span style={styles.stockName}>키움증권</span>
+                <div style={styles.stockDetails}>
+                  <span style={styles.badgeGreen}>상장</span>
+                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                </div>
+              </div>
             </div>
+            <button style={styles.dropdownButton} aria-label="종목 선택">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
 
-          <button style={styles.dropdownButton} onClick={() => {/* Open stock selector */}}>
+          <button style={styles.searchButtonSquare} aria-label="검색">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-
-          <button style={styles.searchButton} onClick={() => {/* Open search */}}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
               <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
         </div>
 
-        <div style={styles.priceDisplay}>
-          <span style={styles.currentPrice}>281,500</span>
-          <div style={styles.changeInfo}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M7 14L12 9L17 14" stroke="#2196F3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span style={styles.changeValue}>1,000</span>
-            <span style={styles.changePercent}>0.35%</span>
+        <div style={styles.priceSection}>
+          <div style={styles.priceBox}>
+            <div style={styles.priceRow}>
+              <span style={styles.currentPrice}>282,000</span>
+            </div>
+            <div style={styles.subLine}>
+              <span style={styles.subArrow}>▼</span>
+              <span style={styles.subChange}>8,500</span>
+              <span style={styles.subPercent}>2.93%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -52,157 +75,201 @@ export const OrderDisplay: React.FC = () => {
           <span style={styles.accountLabel}>통합</span>
           <span style={styles.redDot}>●</span>
         </div>
-        
-        <button style={styles.accountDropdown} onClick={() => {/* Open account selector */}}>
-          <span style={styles.accountNumber}>5244-0129 [위탁종합]</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
 
-        <button style={styles.moreButton} onClick={() => {/* Open more options */}}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="6" cy="12" r="1.5" fill="#666"/>
-            <circle cx="12" cy="12" r="1.5" fill="#666"/>
-            <circle cx="18" cy="12" r="1.5" fill="#666"/>
-          </svg>
-        </button>
+        {/* ✅ 화면 가로 현재폭을 가득 채움 */}
+        <div style={styles.accountDropdownGroup}>
+          <button style={styles.accountDropdown}>
+            <span style={styles.accountNumber}>5244-0129 [위탁종합]</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {/* PIN 슬롯 (_ _ _ _) — 클릭 시 키패드 표시 */}
+          <div
+            style={styles.pinSlot}
+            onClick={() => setShowPad(true)}
+            role="button"
+            aria-label="비밀번호 입력"
+          >
+            <div style={styles.pinChars}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <span key={i} style={styles.pinChar}>
+                  {i < pin.length ? '●' : '_'}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* === 숫자 키패드: 하단 중앙, 가로 430, 세로 고정 === */}
+      {showPad && (
+        <>
+          <div style={styles.keypadBackdrop} onClick={closePad} />
+          <div style={styles.keypadSheetWrap} onMouseDown={(e) => e.preventDefault()}>
+            <div style={styles.keypadSheet}>
+              <div style={styles.keypadHeader}>
+                <button style={styles.closeBtn} onClick={closePad}>닫음</button>
+              </div>
+
+              <div style={styles.keypadGrid}>
+                {['1','2','3','4','5','6','7','8','9','⌫','0','확인'].map((k) => (
+                  <button
+                    key={k}
+                    style={k === '확인' ? styles.keyBtnConfirmFull : styles.keyBtnFull}
+                    onClick={() => handlePadClick(k)}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
+/* =================== 스타일 =================== */
 const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    backgroundColor: '#fff',
-    borderBottom: '1px solid #e0e0e0',
+  container: { backgroundColor: '#fff', borderBottom: '1px solid #e0e0e0', padding: 4 },
+
+  /* 상단 검색/가격 */
+  selectorRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  selectorGroup: { display: 'flex', alignItems: 'center', gap: 0, flex: 1, minWidth: 0 },
+  selectorBox: {
+    flex: 1, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    border: '1px solid #e0e0e0', borderRight: 'none', borderRadius: '8px 0 0 8px', backgroundColor: '#fff', padding: '0 10px',
   },
-  stockSelector: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px',
-    gap: '12px',
-    borderBottom: '1px solid #e0e0e0',
+  selectorLeft: { display: 'flex', alignItems: 'center', gap: 8 },
+  favoriteIcon: { display: 'flex', alignItems: 'center' },
+  stockInfo: { display: 'flex', flexDirection: 'column', gap: 2 },
+  stockName: { fontSize: 16, color: '#000', lineHeight: 1.2 },
+  stockDetails: { display: 'flex', alignItems: 'center', gap: 6 },
+  badgeGreen: { fontSize: 11, color: '#4caf50', backgroundColor: 'rgba(76,175,80,0.12)', padding: '2px 6px', borderRadius: 3 },
+  stockCode: { fontSize: 12, color: '#666' },
+  dropdownButton: { background: 'none', border: 'none', padding: 4, cursor: 'pointer' },
+  searchButtonSquare: {
+    width: 40, height: 50, borderRadius: '0 8px 8px 0', border: '1px solid #e0e0e0', borderLeft: 'none',
+    backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   },
-  stockLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+
+  priceSection: { display: 'flex', alignItems: 'center', gap: 8 },
+  priceBox: { display: 'inline-block' },
+  priceRow: { display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' },
+  currentPrice: { fontSize: 26, fontWeight: 600, color: '#2196F3', lineHeight: 1.0 },
+  subLine: { width: '100%', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginTop: 2 },
+  subArrow: { fontSize: 12, color: '#2196F3' },
+  subChange: { fontSize: 12, color: '#2196F3' },
+  subPercent: { fontSize: 12, color: '#2196F3' },
+
+  /* Account Selector */
+  accountSelector: { display: 'flex', alignItems: 'center', padding: '12px', gap: 12 },
+  accountLeft: { display: 'flex', alignItems: 'center', gap: 6 },
+  accountLabel: { fontSize: 14, color: '#000' },
+  redDot: { fontSize: 8, color: '#ff4444' },
+
+  /* ✅ 드롭다운 + PIN 슬롯: 현재 폭을 가득 채움 */
+  accountDropdownGroup: {
     flex: 1,
-  },
-  favoriteIcon: {
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stockInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  stockName: {
-    fontSize: '16px',
-    color: '#000',
-  },
-  stockDetails: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  badgeGreen: {
-    fontSize: '11px',
-    color: '#4caf50',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    padding: '2px 6px',
-    borderRadius: '3px',
-  },
-  stockCode: {
-    fontSize: '12px',
-    color: '#666',
-  },
-  dropdownButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  searchButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  priceDisplay: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: '4px',
-  },
-  currentPrice: {
-    fontSize: '24px',
-    color: '#2196F3',
-  },
-  changeInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  changeValue: {
-    fontSize: '13px',
-    color: '#2196F3',
-  },
-  changePercent: {
-    fontSize: '13px',
-    color: '#2196F3',
-  },
-  accountSelector: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px',
-    gap: '12px',
-  },
-  accountLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  accountLabel: {
-    fontSize: '14px',
-    color: '#000',
-  },
-  redDot: {
-    fontSize: '8px',
-    color: '#ff4444',
+    gap: 0,
+    minWidth: 0,
   },
   accountDropdown: {
-    flex: 1,
+    flex: 1,                    // ← 좌측 드롭다운 가변 폭
+    minWidth: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '8px 12px',
     border: '1px solid #e0e0e0',
-    borderRadius: '4px',
+    borderRight: 'none',
+    borderRadius: '8px 0 0 8px',
     backgroundColor: '#fff',
     cursor: 'pointer',
   },
-  accountNumber: {
-    fontSize: '14px',
-    color: '#000',
-  },
-  moreButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
+  accountNumber: { fontSize: 14, color: '#000', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+
+  /* PIN 슬롯 (_ _ _ _) — 우측 고정 폭 */
+  pinSlot: {
+    position: 'relative',
+    height: 36,
+    width: 110,               // 고정 폭 (조절 가능)
+    padding: '0 10px',
+    border: '1px solid #e0e0e0',
+    borderRadius: '0 8px 8px 0',
+    backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  pinChars: { display: 'flex', gap: 8, fontFamily: 'monospace', letterSpacing: 2 },
+  pinChar: { fontSize: 16, color: '#333' },
+
+  /* === 키패드: 하단 중앙, 가로 430, 작은 화면은 100%로 수축 === */
+  keypadBackdrop: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 3000,
+  },
+  keypadSheetWrap: {
+    position: 'fixed',
+    left: 0, right: 0, bottom: 0,
+    display: 'flex',
+    justifyContent: 'center',   // 중앙 정렬
+    zIndex: 3001,
+    pointerEvents: 'none',      // 내부만 클릭되게
+  },
+  keypadSheet: {
+    width: 430,                 // ✅ 가로 430
+    maxWidth: '100%',           // 화면이 더 작으면 100%로
+    height: 300,                // ✅ 적당한 높이
+    background: '#fff',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    overflow: 'hidden',
+    boxShadow: '0 -8px 24px rgba(0,0,0,0.18)',
+    pointerEvents: 'auto',      // 내부 클릭 활성화
+  },
+  keypadHeader: {
+    display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
+    height: 44, padding: '0 12px', borderBottom: '1px solid #eee',
+  },
+  closeBtn: { border: 'none', background: 'none', fontSize: 14, color: '#333', cursor: 'pointer' },
+
+  // 버튼들이 좌우 끝까지: gap/padding 0, 3열 1fr
+  keypadGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
+    gridAutoRows: '64px',   // 4행 * 64 = 256px + 헤더 44 ≈ 300px
+    gap: 0,
+    width: '100%',
+  },
+  keyBtnFull: {
+    width: '100%', height: '100%',
+    border: '1px solid #e5e5e5',
+    borderRight: 'none',
+    borderBottom: 'none',
+    background: '#fff',
+    fontSize: 18,
+    color: '#111',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer',
+  },
+  keyBtnConfirmFull: {
+    width: '100%', height: '100%',
+    border: '1px solid #3d4273',
+    borderRight: 'none',
+    borderBottom: 'none',
+    background: '#3d4273',
+    fontSize: 18,
+    color: '#fff',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer',
   },
 };

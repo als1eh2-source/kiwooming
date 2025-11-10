@@ -1,13 +1,9 @@
 import React from 'react';
 
 export const ChartHeader: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('종목차트');
+  const [activeTab, setActiveTab] = React.useState('호가');
 
-  const tabs = [
-    { id: '종목차트', label: '종목차트' },
-    { id: '재무차트', label: '재무차트' },
-    { id: '지수차트', label: '지수차트' },
-  ];
+  const tabs = ['종목차트', '재무차트', '지수차트'];
 
   return (
     <header style={styles.header}>
@@ -21,19 +17,14 @@ export const ChartHeader: React.FC = () => {
         <nav style={styles.tabNav}>
           {tabs.map((tab) => (
             <button
-              key={tab.id}
+              key={tab}
               style={{
                 ...styles.tab,
-                ...(activeTab === tab.id ? styles.tabActive : {}),
+                ...(activeTab === tab ? styles.tabActive : {}),
               }}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setActiveTab(tab)}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="8" width="6" height="13" fill="currentColor" opacity="0.8"/>
-                <rect x="9" y="3" width="6" height="18" fill="currentColor"/>
-                <rect x="15" y="12" width="6" height="9" fill="currentColor" opacity="0.6"/>
-              </svg>
-              {tab.label}
+              {tab}
             </button>
           ))}
         </nav>
@@ -58,7 +49,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     zIndex: 100,
   },
   topBar: {
-    backgroundColor: '#4a5a8e',
+    backgroundColor: '#5468b5',
     display: 'flex',
     alignItems: 'center',
     padding: '12px 8px',
@@ -75,7 +66,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   tabNav: {
     display: 'flex',
-    gap: '12px',
+    gap: '16px',
     flex: 1,
     overflowX: 'auto',
   },
@@ -87,9 +78,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     fontSize: '15px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
   },
   tabActive: {
     color: '#fff',
@@ -104,3 +92,4 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'center',
   },
 };
+
