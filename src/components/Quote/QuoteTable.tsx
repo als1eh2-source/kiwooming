@@ -161,19 +161,6 @@ export const QuoteTable: React.FC = () => {
           <span style={styles.summaryValue}>1,453</span>
         </div>
       </div>
-
-      {/* Index Info */}
-      <div style={styles.indexBar}>
-        <span style={styles.indexName}>코스닥</span>
-        <span style={styles.indexValue}>901.89</span>
-        <div style={styles.indexChange}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M7 14L12 9L17 14" stroke="#2196F3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span style={styles.indexChangeValue}>24.68</span>
-        </div>
-        <span style={styles.indexPercent}>2.66%</span>
-      </div>
     </div>
   );
 };
@@ -366,35 +353,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  
-  // Index Bar Styles
-  indexBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    backgroundColor: '#f5f5f5',
-  },
-  indexName: {
-    fontSize: '13px',
-    color: '#000',
-  },
-  indexValue: {
-    fontSize: '14px',
-    color: '#2196F3',
-  },
-  indexChange: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  indexChangeValue: {
-    fontSize: '13px',
-    color: '#2196F3',
-  },
-  indexPercent: {
-    fontSize: '13px',
-    color: '#2196F3',
   },
 };

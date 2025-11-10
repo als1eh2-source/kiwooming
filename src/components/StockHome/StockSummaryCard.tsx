@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ 페이지 이동용
 
-/**
- * StockSummaryCard Component
- * 
- * 종목 요약 정보 카드
- * - 종목명, 현재가, 등락률
- * - 미니 차트 영역
- * - 기간 선택 및 변동률 표시
- * - 하단 탭 메뉴 (종목톡, 호가, 차트, 주문)
- * - 모바일 최적화 (360-430px)
- */
-
+// ✅ 타입 인터페이스 복구
 interface StockData {
 name: string;
 code: string;
@@ -33,8 +24,9 @@ label: string;
 export const StockSummaryCard: React.FC = () => {
 const [isFavorite, setIsFavorite] = useState<boolean>(false);
 const [selectedPeriod, setSelectedPeriod] = useState<string>('지난 1개월');
+const navigate = useNavigate(); // ✅ 추가
 
-// Dummy stock data
+// ✅ 더미 데이터
 const stock: StockData = {
 name: '키움증권',
 code: '039490',
@@ -57,49 +49,41 @@ const bottomTabs: TabItem[] = [
 { id: 4, icon: '🔁', label: '주문' },
 ];
 
-const formatPrice = (price: number): string => {
-return price.toLocaleString('ko-KR');
-};
+const formatPrice = (price: number): string => price.toLocaleString('ko-KR');
 
-const handleFavoriteToggle = () => {
-setIsFavorite(!isFavorite);
-console.log('Favorite toggled:', !isFavorite);
-};
+const handleFavoriteToggle = () => setIsFavorite(!isFavorite);
 
 const handlePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 setSelectedPeriod(e.target.value);
-console.log('Period changed:', e.target.value);
 };
 
+// ✅ 탭 클릭 시 페이지 이동
 const handleTabClick = (tab: TabItem) => {
 console.log('Tab clicked:', tab.label);
+if (tab.label === '호가') navigate('/quote');
+else if (tab.label === '차트') navigate('/chart');
+else if (tab.label === '주문') navigate('/order');
 };
 
 return (
 <div style={styles.container}>
-    {/* 1️⃣ Header Info Section */}
+    {/* 1️⃣ Header Section */}
     <div style={styles.headerSection}>
-    {/* Caption row */}
     <div style={styles.captionRow}>
         <span style={styles.captionText}>
-        통합  |  {stock.code} {stock.market}  |  {stock.category}
+        통합 | {stock.code} {stock.market} | {stock.category}
         </span>
     </div>
-
-    {/* Name row with star */}
     <div style={styles.nameRow}>
         <button onClick={handleFavoriteToggle} style={styles.favoriteButton}>
-        <span style={styles.favoriteIcon}>
-            {isFavorite ? '⭐' : '☆'}
-        </span>
+        <span style={styles.favoriteIcon}>{isFavorite ? '⭐' : '☆'}</span>
         </button>
         <h2 style={styles.stockName}>{stock.name}</h2>
     </div>
     </div>
 
-    {/* 2️⃣ Price + Chart Section */}
+    {/* 2️⃣ 가격 + 차트 영역 */}
     <div style={styles.priceChartSection}>
-    {/* Price area */}
     <div style={styles.priceArea}>
         <div style={styles.mainPrice}>{formatPrice(stock.price)}</div>
         <div style={styles.changeArea}>
@@ -109,23 +93,21 @@ return (
             color: stock.change >= 0 ? '#D32F2F' : '#1976D2',
             }}
         >
-            {stock.change >= 0 ? '▲' : '▼'} {formatPrice(Math.abs(stock.change))}  {Math.abs(stock.rate)}%
+            {stock.change >= 0 ? '▲' : '▼'} {formatPrice(Math.abs(stock.change))} {Math.abs(stock.rate)}%
         </span>
         </div>
     </div>
 
-    {/* Chart area */}
+    {/* ✅ 미니 차트 복구 */}
     <div style={styles.chartArea}>
-        <div style={styles.chartPlaceholder}>
-        {/* Horizontal gradient: blue → pink */}
-        </div>
+        <div style={styles.chartPlaceholder}></div>
         <div style={styles.chartLabel}>
         기준: {stock.baseDate}, {stock.chartType}
         </div>
     </div>
     </div>
 
-    {/* 3️⃣ Period Summary Section */}
+    {/* 3️⃣ 기간 요약 영역 */}
     <div style={styles.periodSummarySection}>
     <div style={styles.periodDropdownWrapper}>
         <select
@@ -147,7 +129,7 @@ return (
     </div>
     </div>
 
-    {/* 4️⃣ Bottom Navigation Tabs */}
+    {/* 4️⃣ 하단 탭 메뉴 */}
     <div style={styles.bottomNavTabs}>
     {bottomTabs.map((tab) => (
         <button
@@ -164,6 +146,7 @@ return (
 );
 };
 
+// ✅ 스타일 정의
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
 backgroundColor: '#FFFFFF',
@@ -176,25 +159,15 @@ fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',
 },
 
-// 1️⃣ Header Info Section
+// 1️⃣ Header
 headerSection: {
 display: 'flex',
 flexDirection: 'column',
 marginBottom: '16px',
 },
-captionRow: {
-marginBottom: '6px',
-},
-captionText: {
-fontSize: '12px',
-color: '#757575',
-fontWeight: 400,
-},
-nameRow: {
-display: 'flex',
-alignItems: 'center',
-gap: '8px',
-},
+captionRow: { marginBottom: '6px' },
+captionText: { fontSize: '12px', color: '#757575', fontWeight: 400 },
+nameRow: { display: 'flex', alignItems: 'center', gap: '8px' },
 favoriteButton: {
 border: 'none',
 backgroundColor: 'transparent',
@@ -203,45 +176,26 @@ padding: '0',
 display: 'flex',
 alignItems: 'center',
 },
-favoriteIcon: {
-fontSize: '20px',
-},
-stockName: {
-margin: 0,
-fontSize: '18px',
-fontWeight: 700,
-color: '#000000',
-},
+favoriteIcon: { fontSize: '20px' },
+stockName: { margin: 0, fontSize: '18px', fontWeight: 700, color: '#000' },
 
-// 2️⃣ Price + Chart Section
+// 2️⃣ Price + Chart
 priceChartSection: {
 display: 'flex',
 flexDirection: 'column',
 alignItems: 'center',
 marginBottom: '16px',
 },
-priceArea: {
-textAlign: 'center',
-marginBottom: '8px',
-},
+priceArea: { textAlign: 'center', marginBottom: '8px' },
 mainPrice: {
 fontSize: '28px',
 fontWeight: 700,
 color: '#1E2A78',
 marginBottom: '4px',
 },
-changeArea: {
-display: 'flex',
-justifyContent: 'center',
-},
-changeText: {
-fontSize: '14px',
-fontWeight: 600,
-},
-chartArea: {
-width: '100%',
-marginTop: '8px',
-},
+changeArea: { display: 'flex', justifyContent: 'center' },
+changeText: { fontSize: '14px', fontWeight: 600 },
+chartArea: { width: '100%', marginTop: '8px' },
 chartPlaceholder: {
 width: '100%',
 height: '120px',
@@ -249,13 +203,9 @@ background: 'linear-gradient(90deg, #BBDEFB 0%, #F8BBD0 100%)',
 borderRadius: '8px',
 marginBottom: '4px',
 },
-chartLabel: {
-fontSize: '11px',
-color: '#757575',
-textAlign: 'right',
-},
+chartLabel: { fontSize: '11px', color: '#757575', textAlign: 'right' },
 
-// 3️⃣ Period Summary Section
+// 3️⃣ 기간 요약
 periodSummarySection: {
 display: 'flex',
 justifyContent: 'space-between',
@@ -273,7 +223,7 @@ border: 'none',
 backgroundColor: 'transparent',
 fontSize: '14px',
 fontWeight: 600,
-color: '#333333',
+color: '#333',
 cursor: 'pointer',
 paddingRight: '18px',
 appearance: 'none',
@@ -283,20 +233,13 @@ dropdownArrow: {
 position: 'absolute',
 right: '0',
 fontSize: '10px',
-color: '#666666',
+color: '#666',
 pointerEvents: 'none',
 },
-termChangeText: {
-fontSize: '13px',
-color: '#333333',
-fontWeight: 400,
-},
-termChangeValue: {
-fontWeight: 700,
-color: '#D32F2F',
-},
+termChangeText: { fontSize: '13px', color: '#333', fontWeight: 400 },
+termChangeValue: { fontWeight: 700, color: '#D32F2F' },
 
-// 4️⃣ Bottom Navigation Tabs
+// 4️⃣ 하단 탭
 bottomNavTabs: {
 display: 'grid',
 gridTemplateColumns: 'repeat(4, 1fr)',
@@ -314,12 +257,6 @@ gap: '6px',
 cursor: 'pointer',
 padding: '8px 4px',
 },
-tabIcon: {
-fontSize: '20px',
-},
-tabLabel: {
-fontSize: '13px',
-color: '#333333',
-fontWeight: 500,
-},
+tabIcon: { fontSize: '20px' },
+tabLabel: { fontSize: '13px', color: '#333', fontWeight: 500 },
 };

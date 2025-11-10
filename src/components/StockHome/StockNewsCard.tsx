@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ 추가
 
 /**
  * StockNewsCard Component
@@ -17,6 +18,8 @@ date: string;
 }
 
 export const StockNewsCard: React.FC = () => {
+const navigate = useNavigate(); // ✅ 추가
+
 // Mock news data
 const newsData: NewsItem[] = [
 {
@@ -47,8 +50,12 @@ const handleExpand = () => {
 console.log('Expand to full news list');
 };
 
-const handleNewsClick = (newsTitle: string) => {
-console.log('Go to news article:', newsTitle);
+const handleNewsClick = (newsTitle: string, id: number) => {
+if (id === 1) {
+    navigate('/news'); // ✅ 첫 번째 뉴스 클릭 시 /news로 이동
+} else {
+    console.log('Go to news article:', newsTitle);
+}
 };
 
 return (
@@ -71,7 +78,7 @@ return (
     {newsData.map((news, index) => (
         <React.Fragment key={news.id}>
         <div
-            onClick={() => handleNewsClick(news.title)}
+            onClick={() => handleNewsClick(news.title, news.id)} // ✅ id 인자 추가
             style={styles.newsItem}
         >
             <p style={styles.newsTitle}>{news.title}</p>
