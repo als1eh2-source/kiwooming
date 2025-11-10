@@ -19,32 +19,30 @@ const reportContent = {
 
 return (
 <div style={styles.container}>
+    {/* 헤더 */}
     <div style={styles.header}>
     <span style={styles.icon}>🤖</span>
     <h3 style={styles.title}>AI가 들려주는 리포트</h3>
     </div>
 
+    {/* 언더라인 탭 */}
     <div style={styles.tabContainer}>
-    <button
-        onClick={() => setSelectedTab('시황리포트')}
+    {(['시황리포트', '종목리포트'] as ReportTab[]).map((tab) => (
+        <button
+        key={tab}
+        onClick={() => setSelectedTab(tab)}
         style={{
-        ...styles.tab,
-        ...(selectedTab === '시황리포트' ? styles.activeTab : {}),
+            ...styles.tab,
+            ...(selectedTab === tab ? styles.activeTab : styles.inactiveTab),
         }}
-    >
-        시황리포트
-    </button>
-    <button
-        onClick={() => setSelectedTab('종목리포트')}
-        style={{
-        ...styles.tab,
-        ...(selectedTab === '종목리포트' ? styles.activeTab : {}),
-        }}
-    >
-        종목리포트
-    </button>
+        >
+        {tab}
+        {selectedTab === tab && <div style={styles.underline} />}
+        </button>
+    ))}
     </div>
 
+    {/* 리포트 내용 */}
     <div style={styles.reportContent}>
     <p style={styles.date}>{reportContent[selectedTab].date}</p>
     <p style={styles.content}>{reportContent[selectedTab].content}</p>
@@ -55,52 +53,71 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
+width: '100%',
 backgroundColor: '#FFFFFF',
 borderRadius: '16px',
 padding: '20px 16px',
-margin: '12px 16px',
+margin: '0 auto 20px auto',
 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-maxWidth: '430px',
 boxSizing: 'border-box',
 },
 header: {
 display: 'flex',
 alignItems: 'center',
 gap: '8px',
-marginBottom: '12px',
+paddingBottom: '10px',
+borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+marginBottom: '16px',
 },
 icon: {
 fontSize: '20px',
 },
 title: {
 margin: 0,
-fontSize: '16px',
+fontSize: '18px',
 fontWeight: 700,
+color: '#000',
 },
 tabContainer: {
 display: 'flex',
-gap: '8px',
+justifyContent: 'flex-start',
+alignItems: 'flex-end',
+gap: '20px',
+borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+height: '52px',
 marginBottom: '16px',
 },
 tab: {
-border: '1px solid #e0e0e0',
-backgroundColor: '#fff',
-fontSize: '14px',
-padding: '8px 16px',
+position: 'relative',
+justifyContent:'center',
+background: 'none',
+border: 'none',
+fontSize: '15px',
+fontWeight: 600,
 cursor: 'pointer',
-borderRadius: '20px',
-color: '#999',
-fontWeight: 500,
+padding: '8px 0',
+marginLeft:'5px',
+transition: 'color 0.2s ease',
 },
 activeTab: {
-backgroundColor: '#3730a3',
-color: '#fff',
-borderColor: '#3730a3',
+color: '#000',
+},
+inactiveTab: {
+color: '#999',
+},
+underline: {
+position: 'absolute',
+bottom: '-1.5px',
+left: 0,
+right: 0,
+height: '2px',
+backgroundColor: '#000',
+borderRadius: '2px',
 },
 reportContent: {
-backgroundColor: '#f9f9f9',
+backgroundColor: '#F9FAFB',
+borderRadius: '12px',
 padding: '16px',
-borderRadius: '8px',
 },
 date: {
 margin: '0 0 8px 0',
@@ -115,3 +132,6 @@ lineHeight: '1.6',
 color: '#333',
 },
 };
+
+export default AiReportCard;
+

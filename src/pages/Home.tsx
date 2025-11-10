@@ -7,6 +7,8 @@ import { RankingList } from "../components/Home/RankingList";
 import { AiReportCard } from "../components/Home/AiReportBar";
 import { BottomMenuBar } from "../components/Home/BottomMenuBar";
 import { useNavigate } from "react-router-dom";
+import HeaderBar from "../components/Home/HeaderBar";
+import MarketTabs from "../components/Home/MarketTabs";
 
 export default function Home() {
 
@@ -23,6 +25,8 @@ export default function Home() {
       }}>
         
     {/* 상단 */}
+    <HeaderBar onMenuClick={() => console.log('Menu clicked!')} />
+    <MarketTabs></MarketTabs>
     <SearchBar/>
     
     {/* 메인 컨텐츠 */}

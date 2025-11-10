@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ 페이지 이동용
+import { useNavigate } from 'react-router-dom'; 
 
-// ✅ 타입 인터페이스 복구
 interface StockData {
 name: string;
 code: string;
@@ -24,9 +23,9 @@ label: string;
 export const StockSummaryCard: React.FC = () => {
 const [isFavorite, setIsFavorite] = useState<boolean>(false);
 const [selectedPeriod, setSelectedPeriod] = useState<string>('지난 1개월');
-const navigate = useNavigate(); // ✅ 추가
+const navigate = useNavigate(); 
 
-// ✅ 더미 데이터
+// 더미
 const stock: StockData = {
 name: '키움증권',
 code: '039490',
@@ -57,7 +56,7 @@ const handlePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 setSelectedPeriod(e.target.value);
 };
 
-// ✅ 탭 클릭 시 페이지 이동
+// 탭 클릭 시 페이지 이동
 const handleTabClick = (tab: TabItem) => {
 console.log('Tab clicked:', tab.label);
 if (tab.label === '호가') navigate('/quote');
@@ -66,6 +65,7 @@ else if (tab.label === '주문') navigate('/order');
 };
 
 return (
+<div style={styles.outerBox}>
 <div style={styles.container}>
     {/* 1️⃣ Header Section */}
     <div style={styles.headerSection}>
@@ -98,7 +98,7 @@ return (
         </div>
     </div>
 
-    {/* ✅ 미니 차트 복구 */}
+    {/* 미니 차트 복구 */}
     <div style={styles.chartArea}>
         <div style={styles.chartPlaceholder}></div>
         <div style={styles.chartLabel}>
@@ -107,7 +107,7 @@ return (
     </div>
     </div>
 
-    {/* 3️⃣ 기간 요약 영역 */}
+    {/*기간 요약 영역 */}
     <div style={styles.periodSummarySection}>
     <div style={styles.periodDropdownWrapper}>
         <select
@@ -129,7 +129,7 @@ return (
     </div>
     </div>
 
-    {/* 4️⃣ 하단 탭 메뉴 */}
+    {/* 하단 탭 메뉴 */}
     <div style={styles.bottomNavTabs}>
     {bottomTabs.map((tab) => (
         <button
@@ -143,23 +143,27 @@ return (
     ))}
     </div>
 </div>
+</div>
 );
 };
 
-// ✅ 스타일 정의
 const styles: { [key: string]: React.CSSProperties } = {
-container: {
+outerBox: {
+padding: '10px 10px',
 backgroundColor: '#FFFFFF',
-borderRadius: '16px',
-boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-padding: '20px 16px 16px 16px',
-margin: '12px 16px',
+width: '100%',
 boxSizing: 'border-box',
+borderRadius: '4px',
+},
+container: {
+backgroundColor: "#FFFFFF",
+borderRadius: "4px",
+boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08), 0 0 6px rgba(0, 0, 0, 0.05)",
+padding: "16px",
+margin: "10px 0",
 fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',
 },
-
-// 1️⃣ Header
 headerSection: {
 display: 'flex',
 flexDirection: 'column',
@@ -178,8 +182,6 @@ alignItems: 'center',
 },
 favoriteIcon: { fontSize: '20px' },
 stockName: { margin: 0, fontSize: '18px', fontWeight: 700, color: '#000' },
-
-// 2️⃣ Price + Chart
 priceChartSection: {
 display: 'flex',
 flexDirection: 'column',
@@ -205,7 +207,6 @@ marginBottom: '4px',
 },
 chartLabel: { fontSize: '11px', color: '#757575', textAlign: 'right' },
 
-// 3️⃣ 기간 요약
 periodSummarySection: {
 display: 'flex',
 justifyContent: 'space-between',
@@ -239,7 +240,6 @@ pointerEvents: 'none',
 termChangeText: { fontSize: '13px', color: '#333', fontWeight: 400 },
 termChangeValue: { fontWeight: 700, color: '#D32F2F' },
 
-// 4️⃣ 하단 탭
 bottomNavTabs: {
 display: 'grid',
 gridTemplateColumns: 'repeat(4, 1fr)',

@@ -58,7 +58,7 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-    padding: '12px 16px',
+    padding: '30px 10px',
     backgroundColor: '#FFFFFF',
     width: '100%',
     boxSizing: 'border-box',
@@ -69,12 +69,11 @@ searchWrapper: {
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
     border: '1px solid #E5E5E5',
-    borderRadius: '24px',
+    borderRadius: '15px',
     padding: '10px 14px',
     gap: '8px',
     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
     width: '100%',
-    maxWidth: '430px',
     margin: '0 auto',
     boxSizing: 'border-box',
 },

@@ -84,14 +84,28 @@ return (
         style={styles.iconButton}
         aria-label="새로고침"
         >
-        <span style={styles.icon}>🔄</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path
+            d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9462 3.33214 15.3033 4.69672"
+            stroke="#666666"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            />
+            <path
+            d="M15 2.5V5H12.5"
+            stroke="#666666"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            />
+        </svg>
         </button>
         <button
         onClick={handleExpand}
         style={styles.iconButton}
         aria-label="전체보기"
         >
-        <span style={styles.icon}>→</span>
+        <span style={styles.icon}>&gt;</span>
         </button>
     </div>
     </div>
@@ -134,7 +148,7 @@ return (
             <span
             style={{
                 ...styles.changeRate,
-                color: stock.change >= 0 ? '#FF0000' : '#0000FF',
+                color: stock.change >= 0 ? '#DB2777': '#0000FF',
             }}
             >
             {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%
@@ -149,8 +163,7 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-width: "90%",                     // 반응형 폭 (모바일 기준)
-maxWidth: "420px",                // 카드 최대 폭 제한
+width: "100%",                   
 margin: "0 auto 20px auto",       // 가운데 정렬 + 아래쪽 간격
 backgroundColor: "#FFFFFF",
 borderRadius: "16px",
@@ -162,7 +175,8 @@ header: {
 display: 'flex',
 justifyContent: 'space-between',
 alignItems: 'center',
-marginBottom: '16px',
+padding:"10px 0px",
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) "
 },
 title: {
 margin: 0,
@@ -191,19 +205,24 @@ display: 'block',
 },
 tabContainer: {
 display: 'flex',
+alignItems:"center",
+justifyContent:"center",
 gap: '8px',
-marginBottom: '16px',
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) ",
+height:"52px"
 },
 tabButton: {
 flex: 1,
 border: 'none',
-borderRadius: '20px',
-padding: '10px 12px',
+borderRadius: '7px',
+padding: '5px 10px',
+height:"30px",
 fontSize: '13px',
 fontWeight: 500,
 cursor: 'pointer',
 transition: 'all 0.2s ease',
-whiteSpace: 'nowrap',
+alignSelf:"center",
+whiteSpace: 'nowrap'
 },
 activeTab: {
 backgroundColor: '#1E2A78',
@@ -216,14 +235,17 @@ color: '#999999',
 stockList: {
 display: 'flex',
 flexDirection: 'column',
-gap: '14px',
+justifyContent:"space-between",
+gap:'10px'
 },
 stockRow: {
 display: 'flex',
 alignItems: 'center',
 gap: '12px',
 cursor: 'pointer',
-padding: '4px 0',
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) ",
+height:"52px",
+boxSizing:"border-box"
 },
 rank: {
 fontSize: '14px',
@@ -231,26 +253,27 @@ color: '#999999',
 fontWeight: 500,
 minWidth: '20px',
 textAlign: 'center',
+lineHeight:'1'
 },
 stockName: {
 flex: 1,
 fontSize: '14px',
 color: '#000000',
 fontWeight: 500,
+alignItems:"center"
 },
 priceContainer: {
 display: 'flex',
-flexDirection: 'column',
-alignItems: 'flex-end',
-gap: '4px',
+alignItems: 'center',
+gap: '10px',
 },
 price: {
 fontSize: '14px',
-color: '#000000',
-fontWeight: 700,
+color: '#DB2777',
+fontWeight: 500,
 },
 changeRate: {
-fontSize: '12px',
-fontWeight: 600,
+fontSize: '14px',
+fontWeight: 500,
 },
 };
