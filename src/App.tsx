@@ -33,6 +33,16 @@ export default function App() {
         overflowX: "hidden",
       }}
     >
+            <div
+        style={{
+          width: "420px",
+          minHeight: "90vh",
+          backgroundColor: "#F9FAFB",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
     <BrowserRouter>
     <FloatingChatbot />
       <Routes>
@@ -48,6 +58,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </div>
     </div>
   );
 }

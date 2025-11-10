@@ -5,10 +5,9 @@ import { SearchBar } from "../components/Home/SearchBar";
 import { BigDataList } from "../components/Home/BigDataList";
 import { RankingList } from "../components/Home/RankingList";
 import { AiReportCard } from "../components/Home/AiReportBar";
-import { BottomMenuBar } from "../components/Home/BottomMenuBar";
-import { useNavigate } from "react-router-dom";
 import HeaderBar from "../components/Home/HeaderBar";
 import MarketTabs from "../components/Home/MarketTabs";
+import {Footer} from "../components/Global/Footer";
 
 export default function Home() {
 
@@ -45,7 +44,9 @@ export default function Home() {
     </div>
 
     {/* 하단 메뉴 */}
-    <BottomMenuBar></BottomMenuBar>
+    {/* <BottomMenuBar></BottomMenuBar> */}
+    <Footer/>
+
 
 
   </div>;

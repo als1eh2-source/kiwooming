@@ -12,6 +12,7 @@ import { DailyFlowCard } from "../components/StockHome/DailyFlowCard";
 import { PerformanceCard } from "../components/StockHome/PerformanceCard";
 import { DomesticInvestmentCard } from "../components/StockHome/DomesticInvestmentCard";
 import { StockNewsCard } from "../components/StockHome/StockNewsCard";
+import {Footer} from "../components/Global/Footer";
 
 
 export default function StockHome() {
@@ -36,6 +37,7 @@ export default function StockHome() {
     <PerformanceCard/>
     <StockNewsCard/>
     <DomesticInvestmentCard/>
+    <Footer/>
     </div>
   </div>;
 }

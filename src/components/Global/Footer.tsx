@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const QuoteFooter: React.FC = () => {
+export const Footer: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('계좌');
 
   const tabs = [
@@ -75,7 +75,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderTop: '1px solid #e0e0e0',
     zIndex: 999,
 
-    maxWidth: 430,          // 페이지 컨테이너와 동일 폭
+    maxWidth: 420,          // 페이지 컨테이너와 동일 폭
     margin: '0 auto',       // 가운데 정렬
     padding: 8,
     boxSizing: 'border-box',
@@ -145,7 +145,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderBottom: '1px solid #e0e0e0',
     zIndex: 998,                // bottomNav(999) 바로 아래
 
-    maxWidth: 430,              // 페이지 컨테이너와 동일 폭
+    maxWidth: 420,              // 페이지 컨테이너와 동일 폭
     margin: '0 auto',
     boxSizing: 'border-box',
   },

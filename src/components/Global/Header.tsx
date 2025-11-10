@@ -1,28 +1,62 @@
-import React from 'react';
+import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface QuoteHeaderProps {
-  tabs: string[];          // 각 화면별 탭 이름 배열
-  defaultTab?: string;     // 초기 활성 탭 (옵션)
-  onTabChange?: (tab: string) => void; // 탭 전환 콜백 (옵션)
+interface HeaderProps {
+  tabs: string[]; 
+  defaultTab?: string;
+  onTabChange?: (tab: string) => void; 
 }
 
-export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
+export const Header: React.FC<HeaderProps> = ({
   tabs,
   defaultTab,
   onTabChange,
 }) => {
   const [activeTab, setActiveTab] = React.useState(defaultTab || tabs[0]);
+  const navigate = useNavigate();
+
+
+  const navRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!navRef.current) return;
+    isDragging.current = true;
+    startX.current = e.pageX - navRef.current.offsetLeft;
+    scrollLeft.current = navRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !navRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - navRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.3;
+    navRef.current.scrollLeft = scrollLeft.current - walk;
+  };
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
-    onTabChange?.(tab); // 부모에서 콜백 받을 수 있게
+    onTabChange?.(tab);
   };
 
   return (
     <header style={styles.header}>
       <div style={styles.topBar}>
         {/* 뒤로가기 버튼 */}
-        <button style={styles.backButton} onClick={() => { /* Navigate back */ }}>
+        <button
+          style={styles.backButton}
+          onClick={() => navigate(-1)}
+        >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M15 18L9 12L15 6"
@@ -35,7 +69,14 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         </button>
 
         {/* 탭 내비게이션 */}
-        <nav style={styles.tabNav}>
+        <nav
+          ref={navRef}
+          style={styles.tabNav}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -51,7 +92,7 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
         </nav>
 
         {/* 메뉴 버튼 */}
-        <button style={styles.menuButton} onClick={() => { /* Open menu */ }}>
+        <button style={styles.menuButton} onClick={() => {/* open menu */}}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="6" r="1.5" fill="white" />
             <circle cx="12" cy="12" r="1.5" fill="white" />
@@ -65,53 +106,58 @@ export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
 
 const styles: { [key: string]: React.CSSProperties } = {
   header: {
-    backgroundColor: '#fff',
-    position: 'sticky',
+    backgroundColor: "#fff",
+    position: "sticky",
     top: 0,
     zIndex: 100,
   },
   topBar: {
-    backgroundColor: '#5468b5',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px 8px',
-    gap: '12px',
+    backgroundColor: "#5468b5",
+    display: "flex",
+    alignItems: "center",
+    padding: "12px 8px",
+    gap: "12px",
   },
   backButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    background: "none",
+    border: "none",
+    padding: "4px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   tabNav: {
-    display: 'flex',
-    gap: '16px',
+    display: "flex",
+    gap: "16px",
     flex: 1,
-    overflowX: 'auto',
+    overflowX: "auto",
+    overflowY: "hidden",
+    whiteSpace: "nowrap",
+    WebkitOverflowScrolling: "touch",
+    scrollbarWidth: "none",
   },
   tab: {
-    background: 'none',
-    border: 'none',
-    color: 'rgba(255, 255, 255, 0.6)',
-    padding: '4px 0',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    fontSize: '15px',
+    background: "none",
+    border: "none",
+    color: "rgba(255, 255, 255, 0.6)",
+    padding: "4px 0",
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+    fontSize: "15px",
+    userSelect: "none",
   },
   tabActive: {
-    color: '#fff',
+    color: "#fff",
+    fontWeight: 600,
   },
   menuButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    background: "none",
+    border: "none",
+    padding: "4px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 };
-

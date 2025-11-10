@@ -1,25 +1,27 @@
 import React from 'react';
-import { AccountHeader } from '../components/Account/AccountHeader';
 import { AccountSummary } from '../components/Account/AccountSummary';
 import { AccountTable } from '../components/Account/AccountTable';
-import { AccountFooter } from '../components/Account/AccountFooter';
 import { StockDetailModal } from '../components/Account/StockDetailModal';
+import { Header } from '../components/Global/Header';
+import { Footer } from '../components/Global/Footer';
 
 export default function Account() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   return (
     <div style={styles.container}>
-      <AccountHeader />
+      <Header tabs={['국내잔고', '미체결', '예수금', '주문가능금액']} defaultTab="국내잔고"/>
       <main style={styles.main}>
         <AccountSummary />
         <AccountTable onRowClick={() => setIsModalOpen(true)} />
       </main>
-      <AccountFooter />
+
       <StockDetailModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
       />
+      
+      <Footer />
     </div>
   );
 }

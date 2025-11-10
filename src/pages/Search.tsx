@@ -77,7 +77,7 @@ const handleStockClick = (stockName: string) => {
 console.log('Navigate to stock:', stockName);
 
 if (stockName === '키움증권') {
-navigate('/stocks'); // StockHome으로 이동
+navigate('/stockhome'); // StockHome으로 이동
 } else {
 navigate(`/quote/${encodeURIComponent(stockName)}`); // 다른 종목 상세 페이지 이동
 }
@@ -215,7 +215,6 @@ const styles: { [key: string]: React.CSSProperties } = {
 // Page Container
 pageContainer: {
 width: '100%',
-maxWidth: '430px',
 margin: '0 auto',
 backgroundColor: '#FFFFFF',
 minHeight: '100vh',

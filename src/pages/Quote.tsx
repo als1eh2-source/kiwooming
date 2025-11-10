@@ -1,21 +1,21 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { QuoteHeader } from '../components/Quote/QuoteHeader';
 import { QuoteDisplay } from '../components/Quote/QuoteDisplay';
 import { QuoteTable } from '../components/Quote/QuoteTable';
-import { QuoteFooter } from '../components/Quote/QuoteFooter';
+import { Header } from '../components/Global/Header';
+import {Footer} from "../components/Global/Footer";
 
 export default function Quote() {
   const { symbol } = useParams<{ symbol?: string }>();
 
   return (
     <div style={styles.container}>
-      <QuoteHeader />
+      <Header tabs={['호가', '체결', '거래원', '종목투자자', '종목투자']} defaultTab="호가" />
       <main style={styles.main}>
         <QuoteDisplay />
         <QuoteTable />
       </main>
-      <QuoteFooter />
+      <Footer/>
     </div>
   );
 }

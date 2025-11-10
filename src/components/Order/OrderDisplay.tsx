@@ -226,8 +226,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     pointerEvents: 'none',      // 내부만 클릭되게
   },
   keypadSheet: {
-    width: 430,                 // ✅ 가로 430
-    maxWidth: '100%',           // 화면이 더 작으면 100%로
+    width: '100%',           // 화면이 더 작으면 100%로
     height: 300,                // ✅ 적당한 높이
     background: '#fff',
     borderTopLeftRadius: 12,

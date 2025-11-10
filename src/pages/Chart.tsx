@@ -1,21 +1,21 @@
 import React from 'react';
-import { ChartHeader } from '../components/Chart/ChartHeader';
 import { ChartDisplay } from '../components/Chart/ChartDisplay';
 import { ChartControls } from '../components/Chart/ChartControls';
 import { ChartCanvas } from '../components/Chart/ChartCanvas';
-import { ChartFooter } from '../components/Chart/ChartFooter';
+import { Header } from '../components/Global/Header';
+import { Footer } from '../components/Global/Footer';
 // src/pages/Chart.tsx
 // [신규] 차트 페이지 최소 템플릿
 export default function Chart() {
   return (
     <div style={styles.container}>
-      <ChartHeader />
+      <Header tabs={['종목차트', '재무차트', '지수차트']} defaultTab="종목차트"/>
       <main style={styles.main}>
         <ChartDisplay />
         <ChartControls />
         <ChartCanvas />
       </main>
-      <ChartFooter />
+      <Footer />
     </div>
   );
 };

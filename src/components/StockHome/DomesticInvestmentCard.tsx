@@ -122,10 +122,8 @@ return (
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-// 현비언니! maxWidth 없애면 무한확장해여
 container: {
 width: '100%',
-maxWidth:'550px',
 margin: '0 auto',
 backgroundColor: '#FFFFFF',
 padding: '20px 16px',

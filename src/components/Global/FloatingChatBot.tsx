@@ -10,8 +10,8 @@ type Pos = { x: number; y: number };
 export const FloatingChatbot: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname.replace("/", "") || "home"; 
-  const ICON_W = 150;
-  const ICON_H = 150;
+  const ICON_W = 100;
+  const ICON_H = 100;
 
   const [position, setPosition] = useState<Pos>({
     x: window.innerWidth - ICON_W - 24,
