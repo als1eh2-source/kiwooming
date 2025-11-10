@@ -1,21 +1,26 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import MoreMenu from "./MoreMenu";
+import { MoreVertical } from "lucide-react";
 
 interface HeaderProps {
-  tabs: string[]; 
+  tabs: string[];
   defaultTab?: string;
-  onTabChange?: (tab: string) => void; 
+  onTabChange?: (tab: string) => void;
+  onShowKiwooming?: () => void; // ✅ 키우밍 불러오기 prop
 }
 
 export const Header: React.FC<HeaderProps> = ({
   tabs,
   defaultTab,
   onTabChange,
+  onShowKiwooming, // ✅ prop 받기
 }) => {
-  const [activeTab, setActiveTab] = React.useState(defaultTab || tabs[0]);
+  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]);
+  const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
 
-
+  // --- 드래그 가능한 탭 스크롤 ---
   const navRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -28,13 +33,8 @@ export const Header: React.FC<HeaderProps> = ({
     scrollLeft.current = navRef.current.scrollLeft;
   };
 
-  const handleMouseLeave = () => {
-    isDragging.current = false;
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
-  };
+  const handleMouseLeave = () => (isDragging.current = false);
+  const handleMouseUp = () => (isDragging.current = false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging.current || !navRef.current) return;
@@ -53,10 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header style={styles.header}>
       <div style={styles.topBar}>
         {/* 뒤로가기 버튼 */}
-        <button
-          style={styles.backButton}
-          onClick={() => navigate(-1)}
-        >
+        <button style={styles.backButton} onClick={() => navigate(-1)}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M15 18L9 12L15 6"
@@ -91,14 +88,50 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
         </nav>
 
-        {/* 메뉴 버튼 */}
-        <button style={styles.menuButton} onClick={() => {/* open menu */}}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="1.5" fill="white" />
-            <circle cx="12" cy="12" r="1.5" fill="white" />
-            <circle cx="12" cy="18" r="1.5" fill="white" />
-          </svg>
-        </button>
+        {/* ⋮ 더보기 버튼 */}
+        <div style={styles.rightGroup}>
+          <button onClick={() => setShowMenu(true)} style={styles.iconButton}>
+            <MoreVertical size={22} color="#fff" />
+          </button>
+        </div>
+
+        {/* 더보기 메뉴 */}
+        <MoreMenu
+          show={showMenu}
+          onClose={() => setShowMenu(false)}
+          position={{ top: 50, right: 8 }}
+        >
+          <div style={styles.menuContent}>
+            <div style={styles.menuItem}>
+              SOR 사용설정 <span style={styles.menuTag}>[ON]</span>
+            </div>
+            <div style={styles.menuItem}>
+              시세 설정 <span style={styles.menuTag}>[통합]</span>
+            </div>
+            <hr style={styles.divider} />
+            <div style={styles.menuItem}>호가 설정</div>
+            <div style={styles.menuItem}>중간가 보기</div>
+            <hr style={styles.divider} />
+            <div style={styles.menuItem}>MY알림</div>
+            <div style={styles.menuItem}>내맘대로 등록</div>
+            <div style={styles.menuItem}>화면 공유</div>
+
+            {/* ✅ 키우밍 불러오기 */}
+            <div
+              style={{
+                ...styles.menuItem,
+                fontWeight: 600,
+                color: "#2563EB",
+              }}
+              onClick={() => {
+                setShowMenu(false);
+                onShowKiwooming?.(); // 부모(App)에서 상태 변경
+              }}
+            >
+              키우밍 불러오기
+            </div>
+          </div>
+        </MoreMenu>
       </div>
     </header>
   );
@@ -112,6 +145,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     zIndex: 100,
   },
   topBar: {
+    position: "relative",
     backgroundColor: "#5468b5",
     display: "flex",
     alignItems: "center",
@@ -151,13 +185,40 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: "#fff",
     fontWeight: 600,
   },
-  menuButton: {
+  rightGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  },
+  iconButton: {
     background: "none",
     border: "none",
-    padding: "4px",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  menuContent: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    animation: "fadeIn 0.2s ease-in-out",
+  },
+  menuItem: {
+    padding: "10px 16px",
+    fontSize: "14px",
+    color: "#333",
+    display: "flex",
+    cursor: "pointer",
+    justifyContent: "space-between",
+  },
+  menuTag: {
+    color: "#C2185B",
+    fontWeight: 600,
+  },
+  divider: {
+    border: "none",
+    borderTop: "1px solid #E5E7EB",
+    margin: "4px 0",
   },
 };

@@ -29,7 +29,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 container: {
 width: '100%',
 margin: '0 auto',
-backgroundColor: '#FFFFFF',
+backgroundColor: '#F9FAFB',
 padding: '0 16px',
 },
 

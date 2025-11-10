@@ -148,7 +148,7 @@ return (
                 <span
                 style={{
                     ...styles.changeRate,
-                    color: stock.change >= 0 ? '#DB2777': '#0000FF',
+                    color: stock.change >= 0 ? '#DB2777': '#2563EB',
                 }}
                 >
                 {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%

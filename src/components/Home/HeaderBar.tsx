@@ -66,10 +66,10 @@ return (
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
 display: 'flex',
-justifyContent: 'space-between', // 왼쪽 그룹 + 오른쪽 버튼
+justifyContent: 'space-between', 
 alignItems: 'center',
-padding: '12px 16px',
-backgroundColor: '#FFFFFF',
+padding: '12px 5px',
+backgroundColor: '#F9FAFB',
 width: '100%',
 margin: '0 auto',
 },

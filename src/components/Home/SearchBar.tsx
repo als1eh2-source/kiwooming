@@ -59,7 +59,7 @@ return (
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
     padding: '30px 10px',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F9FAFB',
     width: '100%',
     boxSizing: 'border-box',
 },

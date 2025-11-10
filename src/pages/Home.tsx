@@ -17,10 +17,10 @@ export default function Home() {
         backgroundColor: "#F9FAFB",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",   // 🔹 가로 중앙 정렬 핵심
-        justifyContent: "flex-start", // 위에서부터 쌓이도록
+        alignItems: "center",   
+        justifyContent: "flex-start",
         paddingTop: "20px",
-        paddingBottom: "90px", // 하단바 안 겹치게 여백 확보
+        paddingBottom: "30px", 
       }}>
         
     {/* 상단 */}
@@ -33,9 +33,11 @@ export default function Home() {
         style={{
           width: "100%",
           display: "flex",
+          padding:"0 10px",
+          boxSizing:"border-box",
           flexDirection: "column",
-          alignItems: "center", // 내부 컴포넌트들도 중앙 정렬
-          gap: "20px", // 카드 간격 일정하게
+          alignItems: "center",
+          gap: "20px", 
         }}
     >
       <BigDataList></BigDataList>
