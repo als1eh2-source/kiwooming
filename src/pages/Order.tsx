@@ -1,37 +1,37 @@
 import React from 'react';
-import { OrderHeader } from '../components/Order/OrderHeader';
-import { OrderDisplay } from '../components/Order/OrderDisplay';
-import { OrderForm } from '../components/Order/OrderForm';
-import { OrderFooter } from '../components/Order/OrderFooter';
-// src/pages/Order.tsx
-// [신규] 주문 페이지 최소 템플릿
-export default function Order() {
-  return (
-      <div style={styles.container}>
-        <OrderHeader />
-        <main style={styles.main}>
-          <OrderDisplay />
-          <OrderForm />
-        </main>
-        <OrderFooter />
-      </div>
-    );
-  };
+import { useParams } from 'react-router-dom';
+import { QuoteHeader } from '../components/Quote/QuoteHeader';
+import { QuoteDisplay } from '../components/Quote/QuoteDisplay';
+import { QuoteTable } from '../components/Quote/QuoteTable';
+import { QuoteFooter } from '../components/Quote/QuoteFooter';
 
-  const styles: { [key: string]: React.CSSProperties } = {
-    container: {
-      minHeight: '100vh',
-      backgroundColor: '#fff',
-      maxWidth: '430px',
-      margin: '0 auto',
-      position: 'relative',
-      paddingBottom: '60px',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    main: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-    },
-  };
+export default function Quote() {
+  const { symbol } = useParams<{ symbol?: string }>();
+
+  return (
+    <div style={styles.container}>
+      <QuoteHeader />
+      <main style={styles.main}>
+        <QuoteDisplay />
+        <QuoteTable />
+      </main>
+      <QuoteFooter />
+    </div>
+  );
+}
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    minHeight: '100vh',
+    backgroundColor: '#fff',
+    maxWidth: '430px',
+    margin: '0 auto',
+    position: 'relative',
+    paddingBottom: '0px', // ★ 기존 '60px' → 0 으로 변경
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  main: {
+    flex: 1,
+  },
+};

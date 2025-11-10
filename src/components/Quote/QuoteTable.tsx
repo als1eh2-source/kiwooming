@@ -77,24 +77,22 @@ export const QuoteTable: React.FC = () => {
   const currentPrice = 282000;
   const currentIndex = orderBook.findIndex(r => r.price === currentPrice);
 
-  // 버튼 클릭 핸들러 (나중 기능 추가 예정)
   const handlePriceClick = (price: number) => {
     console.log('price clicked:', price);
   };
 
   // 병합 영역(픽셀) 계산
   const ROW_H = UI.ROW_H;
-  const rightMergedHeight = currentIndex * ROW_H;                     // 오른쪽 상단(현재가 위) 높이
-  const leftMergedTop = (currentIndex + 1) * ROW_H;                   // 왼쪽 하단 시작 위치(현재가 아래부터)
+  const rightMergedHeight = currentIndex * ROW_H;                         // 오른쪽 상단(현재가 위) 높이
+  const leftMergedTop = (currentIndex + 1) * ROW_H;                       // 왼쪽 하단 시작 위치
   const leftMergedHeight = (orderBook.length - currentIndex - 1) * ROW_H; // 왼쪽 하단 전체 높이
 
   return (
     <div style={UI.container}>
       {/* ===== 3열 1:1:1 ===== */}
       <div style={UI.grid}>
-        {/* ===== 왼쪽 열 (position:relative) ===== */}
+        {/* ===== 왼쪽 열 ===== */}
         <div style={UI.colLeft}>
-          {/* 개별 셀은 그대로 렌더 (위쪽은 수량, 현재가/아래쪽은 비움) */}
           {orderBook.map((row, i) => {
             const isAbove = i < currentIndex;
             return (
@@ -102,6 +100,8 @@ export const QuoteTable: React.FC = () => {
                 key={`L-${row.price}`}
                 style={{
                   ...UI.cell,
+                  // ★ 마지막 행의 보더 제거 → 아래 총잔량 바와 1px 틈 제거
+                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
                   ...(isAbove ? UI.bgBlueLight : {}),
                 }}
               >
@@ -114,7 +114,7 @@ export const QuoteTable: React.FC = () => {
             );
           })}
 
-          {/* [병합] 왼쪽 대각선 아래: 체결강도 + 임의 체결 리스트 */}
+          {/* [병합] 왼쪽 대각선 아래 */}
           <div
             style={{
               ...UI.leftMerged,
@@ -137,18 +137,18 @@ export const QuoteTable: React.FC = () => {
           </div>
         </div>
 
-        {/* ===== 가운데 열 (가격 버튼, 282,000만 강조) ===== */}
+        {/* ===== 가운데 열 ===== */}
         <div style={UI.colCenter}>
           {orderBook.map((row, i) => {
             const isAbove = i < currentIndex;
             const isBelow = i > currentIndex;
             const isCurrent = i === currentIndex;
-
             return (
               <div
                 key={`C-${row.price}`}
                 style={{
                   ...UI.cell,
+                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom, // ★
                   ...(isAbove ? UI.bgBlueLighter : {}),
                   ...(isBelow ? UI.bgPinkLighter : {}),
                 }}
@@ -164,7 +164,7 @@ export const QuoteTable: React.FC = () => {
                   <span
                     style={{
                       ...(isCurrent ? UI.textCurrent : isAbove ? UI.textBlue : UI.textDefault),
-                      fontSize: 18, // 버튼 텍스트 크게
+                      fontSize: 18,
                     }}
                   >
                     {row.price.toLocaleString()}
@@ -175,9 +175,8 @@ export const QuoteTable: React.FC = () => {
           })}
         </div>
 
-        {/* ===== 오른쪽 열 (position:relative) ===== */}
+        {/* ===== 오른쪽 열 ===== */}
         <div style={UI.colRight}>
-          {/* 개별 셀은 아래쪽 수량만 표시 */}
           {orderBook.map((row, i) => {
             const isBelow = i > currentIndex;
             return (
@@ -185,6 +184,7 @@ export const QuoteTable: React.FC = () => {
                 key={`R-${row.price}`}
                 style={{
                   ...UI.cell,
+                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom, // ★
                   ...(isBelow ? UI.bgPinkLight : {}),
                 }}
               >
@@ -197,7 +197,7 @@ export const QuoteTable: React.FC = () => {
             );
           })}
 
-          {/* [병합] 오른쪽 대각선 위: 메트릭 패널 */}
+          {/* [병합] 오른쪽 대각선 위 */}
           <div
             style={{
               ...UI.rightMerged,
@@ -216,7 +216,7 @@ export const QuoteTable: React.FC = () => {
         </div>
       </div>
 
-      {/* ===== Sticky 총잔량 ===== */}
+      {/* ===== 총잔량 (테이블 내부, 고정 해제) ===== */}
       <div style={UI.bottomSticky}>
         <div style={UI.summaryItem}><span style={UI.summaryValue}>1,356</span></div>
         <div style={UI.summaryItem}>
@@ -235,20 +235,21 @@ export const QuoteTable: React.FC = () => {
 
 /* =================== 스타일 =================== */
 const UI = {
-  ROW_H: 48, // ← 행 높이(크게)
+  ROW_H: 48,
   container: {
     backgroundColor: '#fff',
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
     overflow: 'hidden',
+    paddingBottom: 0,
   } as React.CSSProperties,
 
   grid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr',
     flex: 1,
-    overflow: 'auto',
+    overflow: 'visible',    // ← 내부 스크롤 해제
     borderTop: '1px solid #e0e0e0',
   } as React.CSSProperties,
 
@@ -266,19 +267,13 @@ const UI = {
     boxSizing: 'border-box',
   } as React.CSSProperties,
 
-  // 가운데 열: 282,000 가격 버튼에만 전체 테두리
-  currentBorder: {
-    border: '2px solid #ff4444',
-    borderRadius: 6,
-  } as React.CSSProperties,
+  currentBorder: { border: '2px solid #ff4444', borderRadius: 6 } as React.CSSProperties,
 
-  // 배경 톤
   bgBlueLight:   { backgroundColor: 'rgba(33,150,243,0.10)' } as React.CSSProperties,
   bgBlueLighter: { backgroundColor: 'rgba(33,150,243,0.06)' } as React.CSSProperties,
   bgPinkLight:   { backgroundColor: 'rgba(255,82,82,0.10)' } as React.CSSProperties,
   bgPinkLighter: { backgroundColor: 'rgba(255,82,82,0.06)' } as React.CSSProperties,
 
-  // 텍스트
   textDefault: { fontSize: 14, color: '#000' } as React.CSSProperties,
   textMuted:   { fontSize: 14, color: 'transparent' } as React.CSSProperties,
   textBlue:    { fontSize: 16, color: '#1976d2' } as React.CSSProperties,
@@ -297,78 +292,50 @@ const UI = {
     padding: 0,
   } as React.CSSProperties,
 
-  // 왼쪽 하단 병합 패널
   leftMerged: {
     position: 'absolute',
     left: 0,
     right: 0,
     padding: '8px 8px 10px',
-    background:
-      'linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.95))',
+    background: 'linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.95))',
     borderTop: '1px solid #eaeaea',
     boxSizing: 'border-box',
   } as React.CSSProperties,
-  executionHeaderRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  } as React.CSSProperties,
+  executionHeaderRow: { display: 'flex', justifyContent: 'space-between', marginBottom: 6 } as React.CSSProperties,
   executionLabel: { fontSize: 12, color: '#666' } as React.CSSProperties,
   executionValue: { fontSize: 13, color: '#ff4444', fontWeight: 600 } as React.CSSProperties,
-  executionList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
-    maxHeight: '100%',
-    overflow: 'auto',
-  } as React.CSSProperties,
-  executionItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 12,
-  } as React.CSSProperties,
+  executionList: { display: 'flex', flexDirection: 'column', gap: 4, maxHeight: '100%', overflow: 'auto' } as React.CSSProperties,
+  executionItem: { display: 'flex', justifyContent: 'space-between', fontSize: 12 } as React.CSSProperties,
   executionPrice: { color: '#000' } as React.CSSProperties,
   executionQty: { color: '#2196F3' } as React.CSSProperties,
 
-  // 오른쪽 상단 병합 패널
   rightMerged: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    background:
-      'linear-gradient(to bottom, rgba(255,255,255,0.96), rgba(255,255,255,0.92))',
+    top: 0, left: 0, right: 0,
+    background: 'linear-gradient(to bottom, rgba(255,255,255,0.96), rgba(255,255,255,0.92))',
     borderBottom: '1px solid #eaeaea',
     boxSizing: 'border-box',
     padding: '8px 8px 10px',
     overflow: 'hidden',
   } as React.CSSProperties,
-  metricsWrap: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-  } as React.CSSProperties,
-  metricRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: 12,
-  } as React.CSSProperties,
+  metricsWrap: { display: 'flex', flexDirection: 'column', gap: 8 } as React.CSSProperties,
+  metricRow: { display: 'flex', justifyContent: 'space-between', fontSize: 12 } as React.CSSProperties,
   metricLabel: { color: '#666' } as React.CSSProperties,
   metricValue: { color: '#000' } as React.CSSProperties,
 
-  // 총잔량 sticky
+  // 총잔량(테이블 내, 고정 해제 + 인덱스바와 접합)
   bottomSticky: {
-    position: 'sticky',
-    bottom: 0,
     backgroundColor: '#fff',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 12,
     padding: '10px 16px',
-    borderTop: '1px solid #e0e00',
-    zIndex: 2,
+    borderTop: '1px solid #e0e0e0',
+    margin: 0,
+    marginBottom: -2,      // 인덱스바 상단 보더와 정확히 접합
   } as React.CSSProperties,
+
   summaryItem:  { display: 'flex', alignItems: 'center', gap: 8 } as React.CSSProperties,
   summaryLabel: { fontSize: 13, color: '#666' } as React.CSSProperties,
   summaryValue: { fontSize: 14, color: '#000' } as React.CSSProperties,
