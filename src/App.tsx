@@ -38,7 +38,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
-        <Route path="/stocks" element={<StockHome />} />
+        <Route path="/stockhome" element={<StockHome />} />
         <Route path="/news" element={<NewsDetail/>} />
         <Route path="/quote" element={<Quote />} />
         <Route path="/quote/:symbol" element={<Quote />} />
