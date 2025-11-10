@@ -3,57 +3,65 @@ import React from 'react';
 export const QuoteDisplay: React.FC = () => {
   return (
     <div style={styles.container}>
-      {/* Stock Selector */}
-      <div style={styles.stockSelector}>
-        {/* 좌측: 셀렉터 박스(별 + 종목정보 + 드롭다운) */}
-        <div style={styles.selectorBox}>
-          <div style={styles.selectorLeft}>
-            <div style={styles.favoriteIcon}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
-              </svg>
-            </div>
+      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
+      <div style={styles.selectorRow}>
+        {/* 왼쪽: 검색 영역 (박스 + 네모형 검색 버튼을 붙여서) */}
+        <div style={styles.selectorGroup}>
+          <div style={styles.selectorBox}>
+            <div style={styles.selectorLeft}>
+              <div style={styles.favoriteIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
+                </svg>
+              </div>
 
-            <div style={styles.stockInfo}>
-              <span style={styles.stockName}>키움증권</span>
-              <div style={styles.stockDetails}>
-                <span style={styles.badgeGreen}>상장</span>
-                <span style={styles.stockCode}>039490 NXT거래가능</span>
+              <div style={styles.stockInfo}>
+                <span style={styles.stockName}>키움증권</span>
+                <div style={styles.stockDetails}>
+                  <span style={styles.badgeGreen}>상장</span>
+                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                </div>
               </div>
             </div>
+
+            {/* 드롭다운 버튼 */}
+            <button style={styles.dropdownButton} aria-label="종목 선택">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
 
-          {/* 드롭다운 버튼 */}
-          <button style={styles.dropdownButton} onClick={() => {/* open selector */}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* 네모형 검색 버튼: 검색박스와 높이 동일, 양쪽이 맞닿도록 */}
+          <button style={styles.searchButtonSquare} aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
+              <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
         </div>
 
-        {/* 우측: 원형 검색 버튼 */}
-        <button style={styles.searchButtonCircle} onClick={() => {/* open search */}}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
-            <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-      </div>
+        {/* 오른쪽: 가격표시 */}
+        <div style={styles.priceSection}>
+          {/* priceBox를 inline-block으로 두어, 내부 가장 넓은 줄(=282,000)에 맞춰 컨테이너가 축소됨 */}
+          <div style={styles.priceBox}>
+            <div style={styles.priceRow}>
+              <span style={styles.currentPrice}>282,000</span>
+            </div>
 
-      {/* Price Display */}
-      <div style={styles.priceSection}>
-        <div style={styles.priceRow}>
-          <span style={styles.currentPrice}>282,000</span>
-          <button style={styles.badge10}>10단</button>
-        </div>
+            {/* 아래 작은 글씨 줄: 상단 텍스트(282,000)와 정확히 같은 너비 */}
+            <div style={styles.subLine}>
+              <span style={styles.subArrow}>▼</span>
+              <span style={styles.subChange}>8,500</span>
+              <span style={styles.subPercent}>2.93%</span>
+            </div>
+          </div>
 
-        <div style={styles.changeRow}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M7 14L12 9L17 14" stroke="#ff4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span style={styles.changeValue}>8,500</span>
-          <span style={styles.changePercent}>2.93%</span>
-          <button style={styles.badge}>예상</button>
+          {/* 10단/예상: 세로로 '간격 없이' 접합 */}
+          <div style={styles.badgeColumn}>
+            <button style={{ ...styles.badgeTop }}>10단</button>
+            <button style={{ ...styles.badgeBottom }}>예상</button>
+          </div>
         </div>
       </div>
     </div>
@@ -64,26 +72,39 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
     borderBottom: '1px solid #e0e0e0',
+    padding: 4,
   },
 
-  /* ====== Stock Selector ====== */
-  stockSelector: {
+  /* ===== 레이아웃 ===== */
+  selectorRow: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
-    padding: 12,
-    borderBottom: '1px solid #e0e0e0',
   },
+
+  /* ===== 왼쪽: 검색 영역 ===== */
+  selectorGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 0,               // ← 간격 없이
+    flex: 1,
+    minWidth: 0,
+  },
+
+  // 검색박스(왼쪽) — 오른쪽 모서리는 0, 버튼과 연결되도록
   selectorBox: {
     flex: 1,
+    minWidth: 0,
+    height: 50,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     border: '1px solid #e0e0e0',
-    borderRadius: 10,
+    borderRight: 'none',                       // ← 버튼과 이중 보더 제거
+    borderRadius: '8px 0 0 8px',               // ← 왼쪽만 라운드
     backgroundColor: '#fff',
-    padding: '8px 10px',
-    minHeight: 44,
+    padding: '0 10px',
     boxSizing: 'border-box',
   },
   selectorLeft: {
@@ -92,29 +113,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: 8,
     minWidth: 0,
   },
-  favoriteIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: '0 0 auto',
-  },
-  stockInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-    minWidth: 0,
-  },
-  stockName: {
-    fontSize: 16,
-    color: '#000',
-    lineHeight: 1.2,
-  },
-  stockDetails: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 6,
-    flexWrap: 'nowrap',
-  },
+  favoriteIcon: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+
+  stockInfo: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 },
+  stockName: { fontSize: 16, color: '#000', lineHeight: 1.2 },
+  stockDetails: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' },
+
   badgeGreen: {
     fontSize: 11,
     color: '#4caf50',
@@ -122,10 +126,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '2px 6px',
     borderRadius: 3,
   },
-  stockCode: {
-    fontSize: 12,
-    color: '#666',
-  },
+  stockCode: { fontSize: 12, color: '#666' },
+
   dropdownButton: {
     background: 'none',
     border: 'none',
@@ -134,64 +136,99 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: '0 0 auto',
   },
-  searchButtonCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: '50%',
+
+  // 검색 버튼(오른쪽) — 왼쪽 모서리 0, 검색박스와 연결되도록
+  searchButtonSquare: {
+    width: 40,
+    height: 50,                                  // ← 검색박스와 동일 높이
+    borderRadius: '0 8px 8px 0',                 // ← 오른쪽만 라운드
     border: '1px solid #e0e0e0',
+    borderLeft: 'none',                           // ← 이중 보더 제거
     backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    flex: '0 0 auto',
   },
 
-  /* ====== Price Section ====== */
+  /* ===== 오른쪽: 가격 영역 ===== */
   priceSection: {
-    padding: 12,
     display: 'flex',
-    flexDirection: 'column',
+    alignItems: 'center',
     gap: 8,
   },
+
+  // 폭을 282,000 텍스트에 '딱 맞게' 고정하기 위한 컨테이너
+  priceBox: {
+    display: 'inline-block',  // ← 컨텐츠 너비만큼만 차지
+  },
+
   priceRow: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   },
   currentPrice: {
-    fontSize: 28,
+    fontSize: 26,
+    fontWeight: 600,
+    color: '#2196F3',
+    lineHeight: 1.0,
+  },
+
+  // 아래 줄(▼ 8,500  2.93%)은 priceBox의 '100% 너비' => 위 텍스트와 정확히 동일한 폭
+  subLine: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 6,
+    marginTop: 2,
+  },
+  subArrow: {
+    fontSize: 12,
     color: '#2196F3',
   },
-  badge10: {
+  subChange: {
+    fontSize: 12,
+    color: '#2196F3',
+  },
+  subPercent: {
+    fontSize: 12,
+    color: '#2196F3',
+  },
+
+  // 10단/예상: 세로로 '간격 없이' 붙이기
+  badgeColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0, // ← 간격 0
+  },
+  badgeBase: {
+    padding: '2px 8px',
+    border: '1px solid #ccc',
+    backgroundColor: '#fff',
+    fontSize: 12,
+    cursor: 'pointer',
+    lineHeight: 1.0,
+  },
+  badgeTop: {
+    padding: '2px 2px',
+    border: '1px solid #ccc',
+    borderBottom: 'none',            // ← 이중 보더 제거
+    borderRadius: '4px 4px 0 0',
+    backgroundColor: '#fff',
+    fontSize: 12,
+    cursor: 'pointer',
+    lineHeight: 1.0,
+  },
+  badgeBottom: {
     padding: '4px 8px',
     border: '1px solid #ccc',
-    borderRadius: 4,
+    borderRadius: '0 0 4px 4px',
     backgroundColor: '#fff',
-    fontSize: 13,
+    fontSize: 12,
     cursor: 'pointer',
-  },
-  changeRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-  },
-  changeValue: {
-    fontSize: 15,
-    color: '#ff4444',
-  },
-  changePercent: {
-    fontSize: 15,
-    color: '#ff4444',
-  },
-  badge: {
-    padding: '2px 6px',
-    border: '1px solid #ccc',
-    borderRadius: 3,
-    backgroundColor: '#fff',
-    fontSize: 11,
-    color: '#666',
+    lineHeight: 1.0,
   },
 };
