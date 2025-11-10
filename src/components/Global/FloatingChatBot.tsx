@@ -1,9 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import kiwooming from "./img/kiwooming.png";
+import kiwooming from "../img/kiwooming.png";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+
+
 
 type Pos = { x: number; y: number };
 
 export const FloatingChatbot: React.FC = () => {
+  const location = useLocation(); // ✅ 현재 경로 감지
+  const currentPath = location.pathname.replace("/", "") || "home"; 
   const ICON_W = 150;
   const ICON_H = 150;
 
@@ -14,6 +20,13 @@ export const FloatingChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isLongPress, setIsLongPress] = useState(false);
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>([
+    {
+      sender: "bot",
+      text: "안녕하세요! 저는 키우밍이에요 🌱 함께 투자 실력을 키워볼까요? 궁금한 게 있으시면 편하게 물어보세요!",
+    },
+  ]);
+  const [input, setInput] = useState("");
 
   const offsetRef = useRef<Pos>({ x: 0, y: 0 });
   const pointerIdRef = useRef<number | null>(null);
@@ -31,7 +44,6 @@ export const FloatingChatbot: React.FC = () => {
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
-  // 클릭 & 드래그 구분
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerIdRef.current = e.pointerId;
     offsetRef.current = { x: e.clientX - position.x, y: e.clientY - position.y };
@@ -74,8 +86,33 @@ export const FloatingChatbot: React.FC = () => {
     };
   }, [isDragging, isLongPress]);
 
+const handleSend = async () => {
+  if (!input.trim()) return;
+
+  const userMsg = { sender: "user", text: input };
+  setMessages((prev) => [...prev, userMsg]);
+  setInput("");
+
+  try {
+    const res = await axios.post("http://127.0.0.1:8000/chat", {
+      text: input,
+      context: currentPath,
+    });
+
+    const reply = res.data.reply || "응답 없음";
+    setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+  } catch (err) {
+    console.error(err);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: "⚠️ 서버 연결 실패 — FastAPI가 켜져 있나요?" },
+    ]);
+  }
+};
+
   return (
     <>
+      {/* 플로팅 버튼 */}
       <div
         className="floating-chatbot"
         style={{
@@ -104,39 +141,56 @@ export const FloatingChatbot: React.FC = () => {
         />
       </div>
 
-      {isOpen && (
-        <div className="chat-overlay">
-          <div className="chat-box">
-            <div className="chat-header">
-              <span>키우밍</span>
-              <button className="close-btn" onClick={toggleChat}>
-                ✕
-              </button>
-            </div>
+      {/* 전체화면 챗봇 */}
+{isOpen && (
+  <div className="chat-overlay">
+    <div className="chat-box">
 
-            <div className="chat-body">
-              <div className="chat-bubble bot">
-                안녕하세요! 키우밍이에요 💬  
-                <br />
-                지금 보고 있는 화면에서 어떤 기능이 궁금하신가요?
-              </div>
-            </div>
+      {/* 상단 프로필 영역 */}
+      <div className="chat-top">
+        <img
+          src={kiwooming}
+          alt="키우밍 프로필"
+          className="profile-img"
+          onClick={toggleChat}
+        />
+        <button className="close-btn" onClick={toggleChat}>✕</button>
+      </div>
 
-            <div className="chat-input">
-              <input type="text" placeholder="메시지를 입력하세요..." />
-              <button>전송</button>
-            </div>
+      {/* 메시지 표시 */}
+      <div className="chat-body">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
+          >
+            <span>{msg.text}</span>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
 
+      {/* 입력창 */}
+      <div className="chat-input">
+        <input
+          type="text"
+          value={input}
+          placeholder="키우밍에게 물어보세요..."
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        />
+        <button onClick={handleSend}>전송</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* 스타일 */}
       <style>{`
-        /* 플로팅 아이콘 */
         .floating-chatbot {
           transition: transform 0.2s ease;
         }
 
-        /* 전체화면 오버레이 */
         .chat-overlay {
           position: fixed;
           inset: 0;
@@ -146,7 +200,7 @@ export const FloatingChatbot: React.FC = () => {
           align-items: center;
           z-index: 99999;
           animation: fadeIn 0.25s ease;
-          backdrop-filter: blur(3px);
+        //   backdrop-filter: blur(3px);
         }
 
         @keyframes fadeIn {
@@ -154,18 +208,18 @@ export const FloatingChatbot: React.FC = () => {
           to { opacity: 1; transform: scale(1); }
         }
 
-        /* 챗봇방 박스 */
         .chat-box {
           width: 92%;
           max-width: 420px;
           height: 80%;
           background: white;
-          border-radius: 20px;
+          border-radius: 20px 20px 0 0;
           display: flex;
           flex-direction: column;
           overflow: hidden;
           box-shadow: 0 8px 32px rgba(0,0,0,0.3);
           animation: slideUp 0.3s ease;
+          position: relative;
         }
 
         @keyframes slideUp {
@@ -173,28 +227,45 @@ export const FloatingChatbot: React.FC = () => {
           to { transform: translateY(0); opacity: 1; }
         }
 
-        .chat-header {
-          background: #2563eb;
-          color: white;
-          padding: 16px;
+        /* 상단 프로필 */
+        .chat-top {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          right: 12px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 18px;
-          font-weight: bold;
+          background: transparent;
+        }
+
+        .profile-img {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          object-fit: cover;
         }
 
         .close-btn {
-          background: none;
+          background: rgba(255,255,255,0.5);
           border: none;
-          color: white;
-          font-size: 22px;
+          color: #333;
+          font-size: 24px;
           cursor: pointer;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          transition: 0.2s;
         }
 
+        .close-btn:hover {
+          background: rgba(255,255,255,0.8);
+        }
+
+        /* 메시지 */
         .chat-body {
           flex: 1;
-          padding: 16px;
+          padding: 80px 16px 16px;
           overflow-y: auto;
           display: flex;
           flex-direction: column;
@@ -210,12 +281,19 @@ export const FloatingChatbot: React.FC = () => {
           font-size: 15px;
         }
 
-        .chat-bubble.bot {
-          align-self: flex-start;
-          background-color: #e5e7eb;
-          color: #111827;
+        .chat-bubble.user {
+          align-self: flex-end;
+          background-color: #3767DD;
+          color: white;
         }
 
+        .chat-bubble.bot {
+          align-self: flex-start;
+          background-color: #E9EFFE;
+          color: black;
+        }
+
+        /* 입력창 */
         .chat-input {
           display: flex;
           border-top: 1px solid #ddd;
@@ -243,7 +321,7 @@ export const FloatingChatbot: React.FC = () => {
         }
 
         .chat-input button:hover {
-          background: #1d4ed8;
+          background: #3767DD;
         }
       `}</style>
     </>
