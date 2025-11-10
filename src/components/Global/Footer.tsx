@@ -1,26 +1,38 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('계좌');
+  const navigate = useNavigate();
 
   const tabs = [
     { id: '관심종목', label: '관심종목' },
-    { id: '현재가', label: '현재가' },
-    { id: '주문', label: '주문' },
-    { id: '차트', label: '차트' },
-    { id: '계좌', label: '계좌' },
+    { id: '현재가', label: '현재가', path: '/quote' },
+    { id: '주문', label: '주문', path: '/order' },
+    { id: '차트', label: '차트', path: '/chart' },
+    { id: '계좌', label: '계좌', path: '/account' },
     { id: '종목', label: '종목' },
   ];
 
+  const handleTabClick = (tab: typeof tabs[number]) => {
+    setActiveTab(tab.id);
+    if (tab.path) navigate(tab.path);
+  };
+
   return (
     <>
-      {/* Index Bar (footer 바로 위, 페이지 폭과 동일) */}
       <div style={styles.indexBar}>
         <span style={styles.indexName}>코스피</span>
         <span style={styles.indexValue}>4,036.08</span>
         <div style={styles.indexChange}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M7 14L12 9L17 14" stroke="#ff4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M7 14L12 9L17 14"
+              stroke="#ff4444"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           <span style={styles.indexChangeValue}>31.66</span>
         </div>
@@ -48,7 +60,7 @@ export const Footer: React.FC = () => {
                 ...styles.navButton,
                 ...(activeTab === tab.id ? styles.navButtonActive : {}),
               }}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab)} // ✅ 페이지 이동 적용
             >
               {tab.label}
             </button>
@@ -60,42 +72,36 @@ export const Footer: React.FC = () => {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  /** Bottom nav: 페이지 폭과 동일(최대 430px), 가운데 정렬 */
   bottomNav: {
     position: 'fixed',
     bottom: 0,
     left: 0,
     right: 0,
-
     display: 'flex',
     alignItems: 'center',
     gap: 8,
-
     backgroundColor: '#fff',
     borderTop: '1px solid #e0e0e0',
     zIndex: 999,
-
-    maxWidth: 420,          // 페이지 컨테이너와 동일 폭
-    margin: '0 auto',       // 가운데 정렬
+    maxWidth: 420,
+    margin: '0 auto',
     padding: 8,
     boxSizing: 'border-box',
   },
 
   /** 탭 컨테이너: 메뉴 버튼 오른쪽 전폭 사용 */
   tabGroup: {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  flex: 1,
-
-  overflowX: 'auto',              // ← 가로 스크롤 활성화
-  overflowY: 'hidden',
-  whiteSpace: 'nowrap',           // ← 줄바꿈 방지
-  WebkitOverflowScrolling: 'touch',
-
-  scrollSnapType: 'x mandatory',  // ← (선택) 스냅 스크롤
-  scrollbarWidth: 'none',         // ← (Firefox) 스크롤바 숨김
-},
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    flex: 1,
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    whiteSpace: 'nowrap',
+    WebkitOverflowScrolling: 'touch',
+    scrollSnapType: 'x mandatory',
+    scrollbarWidth: 'none',
+  },
 
   /** nav 내부용 메뉴 버튼 (고정 해제, 왼쪽 정렬) */
   menuButtonInNav: {
@@ -134,7 +140,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'fixed',
     left: 0,
     right: 0,
-    bottom: 54,                 // 하단 네비 바로 위에 붙도록 (nav 높이 기준)
+    bottom: 54,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -143,14 +149,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#f3f4f6',
     borderTop: '1px solid #e0e0e0',
     borderBottom: '1px solid #e0e0e0',
-    zIndex: 998,                // bottomNav(999) 바로 아래
-
-    maxWidth: 420,              // 페이지 컨테이너와 동일 폭
+    zIndex: 998,
+    maxWidth: 420,
     margin: '0 auto',
     boxSizing: 'border-box',
   },
-  indexName:   { fontSize: 14, color: '#000' },
-  indexValue:  { fontSize: 15, color: '#ff4444' },
+  indexName: { fontSize: 14, color: '#000' },
+  indexValue: { fontSize: 15, color: '#ff4444' },
   indexChange: { display: 'flex', alignItems: 'center', gap: 4 },
   indexChangeValue: { fontSize: 14, color: '#ff4444' },
   indexPercent: { fontSize: 14, color: '#ff4444' },

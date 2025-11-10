@@ -3,6 +3,10 @@ import React from 'react';
 export const AccountSummary: React.FC = () => {
     return (
     <div style={styles.container}>
+      <div style={styles.subTabs}>
+        <button style={{...styles.subTab, ...styles.subTabActive}}>키움 잔고</button>
+        <button style={styles.subTab}>타사 잔고</button>
+      </div>
         {/* Stock Search Bar */}
         <div style={styles.searchBar}>
         <button style={styles.searchTypeButton}>유의</button>
@@ -98,6 +102,24 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
     padding: '0',
+  },
+  subTabs: {
+    display: 'flex',
+    borderBottom: '1px solid #e0e0e0',
+  },
+  subTab: {
+    flex: 1,
+    background: 'none',
+    border: 'none',
+    padding: '16px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    color: '#666',
+    borderBottom: '2px solid transparent',
+  },
+  subTabActive: {
+    color: '#000',
+    borderBottom: '2px solid #000',
   },
   searchBar: {
     display: 'flex',

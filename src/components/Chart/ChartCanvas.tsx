@@ -189,6 +189,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
     flex: 1,
+    height: '100%',
+    overflow: 'hidden',
   },
   chartSection: {
     padding: '0',
@@ -247,7 +249,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   volumeSection: {
     borderTop: '1px solid #e0e0e0',
-    paddingBottom: '8px',
+    paddingBottom: 0,     // ← 불필요한 하단 여백 제거
+    marginBottom: -2,
   },
   volumeHeader: {
     display: 'flex',
