@@ -528,9 +528,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#fffbea',
   },
   priceValue: {
-    fontSize: '18px',
-    color: '#000',
-  },
+  fontSize: '18px',
+  color: '#000',
+  whiteSpace: 'nowrap',     // ✅ 줄바꿈 방지
+  overflow: 'hidden',       // ✅ 텍스트 넘칠 때 숨김 (필요시)
+  textOverflow: 'ellipsis', // ✅ 말줄임표 처리 (선택)
+},
   pricePlusButton: {
     width: '48px',
     border: '1px solid #e0e0e0',

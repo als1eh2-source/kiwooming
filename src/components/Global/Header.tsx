@@ -1,19 +1,40 @@
 import React from 'react';
 
-export const ChartHeader: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('호가');
+interface QuoteHeaderProps {
+  tabs: string[];          // 각 화면별 탭 이름 배열
+  defaultTab?: string;     // 초기 활성 탭 (옵션)
+  onTabChange?: (tab: string) => void; // 탭 전환 콜백 (옵션)
+}
 
-  const tabs = ['종목차트', '재무차트', '지수차트'];
+export const QuoteHeader: React.FC<QuoteHeaderProps> = ({
+  tabs,
+  defaultTab,
+  onTabChange,
+}) => {
+  const [activeTab, setActiveTab] = React.useState(defaultTab || tabs[0]);
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    onTabChange?.(tab); // 부모에서 콜백 받을 수 있게
+  };
 
   return (
     <header style={styles.header}>
       <div style={styles.topBar}>
-        <button style={styles.backButton} onClick={() => {/* Navigate back */}}>
+        {/* 뒤로가기 버튼 */}
+        <button style={styles.backButton} onClick={() => { /* Navigate back */ }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M15 18L9 12L15 6"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
 
+        {/* 탭 내비게이션 */}
         <nav style={styles.tabNav}>
           {tabs.map((tab) => (
             <button
@@ -22,18 +43,19 @@ export const ChartHeader: React.FC = () => {
                 ...styles.tab,
                 ...(activeTab === tab ? styles.tabActive : {}),
               }}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabClick(tab)}
             >
               {tab}
             </button>
           ))}
         </nav>
 
-        <button style={styles.menuButton} onClick={() => {/* Open menu */}}>
+        {/* 메뉴 버튼 */}
+        <button style={styles.menuButton} onClick={() => { /* Open menu */ }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="6" r="1.5" fill="white"/>
-            <circle cx="12" cy="12" r="1.5" fill="white"/>
-            <circle cx="12" cy="18" r="1.5" fill="white"/>
+            <circle cx="12" cy="6" r="1.5" fill="white" />
+            <circle cx="12" cy="12" r="1.5" fill="white" />
+            <circle cx="12" cy="18" r="1.5" fill="white" />
           </svg>
         </button>
       </div>

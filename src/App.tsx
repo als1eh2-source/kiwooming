@@ -13,7 +13,7 @@ import Order from './pages/Order';
 import Chart from './pages/Chart';
 import Account from './pages/Account';
 
-import { FloatingChatbot } from "./components/FloatingChatBot";
+import { FloatingChatbot } from "./components/Global/FloatingChatBot";
 
 
 export default function App() {

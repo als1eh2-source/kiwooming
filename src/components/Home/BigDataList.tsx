@@ -74,90 +74,90 @@ return absChange.toFixed(2);
 };
 
 return (
-<div style={styles.container}>
-    {/* 헤더 영역 */}
-    <div style={styles.header}>
-    <h3 style={styles.title}>빅데이터</h3>
-    <div style={styles.iconGroup}>
-        <button
-        onClick={handleRefresh}
-        style={styles.iconButton}
-        aria-label="새로고침"
-        >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-            d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9462 3.33214 15.3033 4.69672"
-            stroke="#666666"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            />
-            <path
-            d="M15 2.5V5H12.5"
-            stroke="#666666"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            />
-        </svg>
-        </button>
-        <button
-        onClick={handleExpand}
-        style={styles.iconButton}
-        aria-label="전체보기"
-        >
-        <span style={styles.icon}>&gt;</span>
-        </button>
-    </div>
-    </div>
-
-    {/* 카테고리 탭 */}
-    <div style={styles.tabContainer}>
-    {(['실시간 조회', '조회수 급증', '매매 상위'] as CategoryTab[]).map(
-        (tab) => (
-        <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-            ...styles.tabButton,
-            ...(activeTab === tab ? styles.activeTab : styles.inactiveTab),
-            }}
-        >
-            {tab}
-        </button>
-        )
-    )}
-    </div>
-
-    {/* 종목 리스트 */}
-    <div style={styles.stockList}>
-    {currentStocks.map((stock) => (
-        <div
-        key={stock.id}
-        onClick={() => handleStockClick(stock)}
-        style={styles.stockRow}
-        >
-        {/* 순위 */}
-        <span style={styles.rank}>{stock.rank}</span>
-
-        {/* 종목명 */}
-        <span style={styles.stockName}>{stock.name}</span>
-
-        {/* 가격 및 등락률 */}
-        <div style={styles.priceContainer}>
-            <span style={styles.price}>{formatPrice(stock.price)}</span>
-            <span
-            style={{
-                ...styles.changeRate,
-                color: stock.change >= 0 ? '#DB2777': '#0000FF',
-            }}
+    <div style={styles.container}>
+        {/* 헤더 영역 */}
+        <div style={styles.header}>
+        <h3 style={styles.title}>빅데이터</h3>
+        <div style={styles.iconGroup}>
+            <button
+            onClick={handleRefresh}
+            style={styles.iconButton}
+            aria-label="새로고침"
             >
-            {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%
-            </span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9462 3.33214 15.3033 4.69672"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                />
+                <path
+                d="M15 2.5V5H12.5"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                />
+            </svg>
+            </button>
+            <button
+            onClick={handleExpand}
+            style={styles.iconButton}
+            aria-label="전체보기"
+            >
+            <span style={styles.icon}>&gt;</span>
+            </button>
         </div>
         </div>
-    ))}
+
+        {/* 카테고리 탭 */}
+        <div style={styles.tabContainer}>
+        {(['실시간 조회', '조회수 급증', '매매 상위'] as CategoryTab[]).map(
+            (tab) => (
+            <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                ...styles.tabButton,
+                ...(activeTab === tab ? styles.activeTab : styles.inactiveTab),
+                }}
+            >
+                {tab}
+            </button>
+            )
+        )}
+        </div>
+
+        {/* 종목 리스트 */}
+        <div style={styles.stockList}>
+        {currentStocks.map((stock) => (
+            <div
+            key={stock.id}
+            onClick={() => handleStockClick(stock)}
+            style={styles.stockRow}
+            >
+            {/* 순위 */}
+            <span style={styles.rank}>{stock.rank}</span>
+
+            {/* 종목명 */}
+            <span style={styles.stockName}>{stock.name}</span>
+
+            {/* 가격 및 등락률 */}
+            <div style={styles.priceContainer}>
+                <span style={styles.price}>{formatPrice(stock.price)}</span>
+                <span
+                style={{
+                    ...styles.changeRate,
+                    color: stock.change >= 0 ? '#DB2777': '#0000FF',
+                }}
+                >
+                {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%
+                </span>
+            </div>
+            </div>
+        ))}
+        </div>
     </div>
-</div>
 );
 };
 

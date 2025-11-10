@@ -3,48 +3,59 @@ import React from 'react';
 export const ChartDisplay: React.FC = () => {
   return (
     <div style={styles.container}>
-      {/* Stock Selector */}
-      <div style={styles.stockSelector}>
-        <div style={styles.favoriteIcon}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
-          </svg>
-        </div>
-        
-        <div style={styles.stockInfo}>
-          <span style={styles.stockName}>키움증권</span>
-          <div style={styles.stockDetails}>
-            <span style={styles.badgeGreen}>상장</span>
-            <span style={styles.stockCode}>039490 NXT거래가능</span>
+      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
+      <div style={styles.selectorRow}>
+        {/* 왼쪽: 검색 영역 (박스 + 네모형 검색 버튼을 붙여서) */}
+        <div style={styles.selectorGroup}>
+          <div style={styles.selectorBox}>
+            <div style={styles.selectorLeft}>
+              <div style={styles.favoriteIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
+                </svg>
+              </div>
+
+              <div style={styles.stockInfo}>
+                <span style={styles.stockName}>키움증권</span>
+                <div style={styles.stockDetails}>
+                  <span style={styles.badgeGreen}>상장</span>
+                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 드롭다운 버튼 */}
+            <button style={styles.dropdownButton} aria-label="종목 선택">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
+
+          {/* 네모형 검색 버튼: 검색박스와 높이 동일, 양쪽이 맞닿도록 */}
+          <button style={styles.searchButtonSquare} aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
+              <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
 
-        <button style={styles.dropdownButton} onClick={() => {/* Open stock selector */}}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+        {/* 오른쪽: 가격표시 */}
+        <div style={styles.priceSection}>
+          {/* priceBox를 inline-block으로 두어, 내부 가장 넓은 줄(=282,000)에 맞춰 컨테이너가 축소됨 */}
+          <div style={styles.priceBox}>
+            <div style={styles.priceRow}>
+              <span style={styles.currentPrice}>282,000</span>
+            </div>
 
-        <button style={styles.searchButton} onClick={() => {/* Open search */}}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
-            <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      {/* Price Display */}
-      <div style={styles.priceSection}>
-        <div style={styles.priceRow}>
-          <span style={styles.currentPrice}>281,500</span>
-        </div>
-        
-        <div style={styles.changeRow}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M7 14L12 9L17 14" stroke="#2196F3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span style={styles.changeValue}>9,000</span>
-          <span style={styles.changePercent}>3.10%</span>
+            {/* 아래 작은 글씨 줄: 상단 텍스트(282,000)와 정확히 같은 너비 */}
+            <div style={styles.subLine}>
+              <span style={styles.subArrow}>▼</span>
+              <span style={styles.subChange}>8,500</span>
+              <span style={styles.subPercent}>2.93%</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -55,89 +66,129 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
     borderBottom: '1px solid #e0e0e0',
+    padding: 4,
   },
-  stockSelector: {
+
+  /* ===== 레이아웃 ===== */
+  selectorRow: {
     display: 'flex',
     alignItems: 'center',
-    padding: '12px',
-    gap: '8px',
-    borderBottom: '1px solid #e0e0e0',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  favoriteIcon: {
+
+  /* ===== 왼쪽: 검색 영역 ===== */
+  selectorGroup: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stockInfo: {
+    gap: 0,               // ← 간격 없이
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
+    minWidth: 0,
   },
-  stockName: {
-    fontSize: '16px',
-    color: '#000',
-  },
-  stockDetails: {
+
+  // 검색박스(왼쪽) — 오른쪽 모서리는 0, 버튼과 연결되도록
+  selectorBox: {
+    flex: 1,
+    minWidth: 0,
+    height: 50,
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
+    justifyContent: 'space-between',
+    border: '1px solid #e0e0e0',
+    borderRight: 'none',                       // ← 버튼과 이중 보더 제거
+    borderRadius: '8px 0 0 8px',               // ← 왼쪽만 라운드
+    backgroundColor: '#fff',
+    padding: '0 10px',
+    boxSizing: 'border-box',
   },
+  selectorLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0,
+  },
+  favoriteIcon: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+
+  stockInfo: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 },
+  stockName: { fontSize: 16, color: '#000', lineHeight: 1.2 },
+  stockDetails: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' },
+
   badgeGreen: {
-    fontSize: '11px',
+    fontSize: 11,
     color: '#4caf50',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    backgroundColor: 'rgba(76,175,80,0.12)',
     padding: '2px 6px',
-    borderRadius: '3px',
+    borderRadius: 3,
   },
-  stockCode: {
-    fontSize: '12px',
-    color: '#666',
-  },
+  stockCode: { fontSize: 12, color: '#666' },
+
   dropdownButton: {
     background: 'none',
     border: 'none',
-    padding: '4px',
+    padding: 4,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  searchButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
+
+  // 검색 버튼(오른쪽) — 왼쪽 모서리 0, 검색박스와 연결되도록
+  searchButtonSquare: {
+    width: 40,
+    height: 50,                                  // ← 검색박스와 동일 높이
+    borderRadius: '0 8px 8px 0',                 // ← 오른쪽만 라운드
+    border: '1px solid #e0e0e0',
+    borderLeft: 'none',                           // ← 이중 보더 제거
+    backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    cursor: 'pointer',
   },
+
+  /* ===== 오른쪽: 가격 영역 ===== */
   priceSection: {
-    padding: '12px',
     display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+    alignItems: 'center',
+    gap: 8,
   },
+
+  // 폭을 282,000 텍스트에 '딱 맞게' 고정하기 위한 컨테이너
+  priceBox: {
+    display: 'inline-block',  // ← 컨텐츠 너비만큼만 차지
+  },
+
   priceRow: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   },
   currentPrice: {
-    fontSize: '28px',
+    fontSize: 26,
+    fontWeight: 600,
     color: '#2196F3',
+    lineHeight: 1.0,
   },
-  changeRow: {
+
+  // 아래 줄(▼ 8,500  2.93%)은 priceBox의 '100% 너비' => 위 텍스트와 정확히 동일한 폭
+  subLine: {
+    width: '100%',
     display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 6,
+    marginTop: 2,
   },
-  changeValue: {
-    fontSize: '15px',
+  subArrow: {
+    fontSize: 12,
     color: '#2196F3',
   },
-  changePercent: {
-    fontSize: '15px',
+  subChange: {
+    fontSize: 12,
+    color: '#2196F3',
+  },
+  subPercent: {
+    fontSize: 12,
     color: '#2196F3',
   },
 };
