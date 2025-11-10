@@ -78,7 +78,7 @@ return (
             {theme.subtitle && <p style={styles.themeSubtitle}>{theme.subtitle}</p>}
         </div>
         <div style={styles.themeValue}>
-            {theme.returnRate > 0 ? '+' : ''}
+            {/* {theme.returnRate > 0 ? '+' : ''} */}
             {theme.returnRate.toFixed(2)}%
         </div>
         </div>
@@ -88,7 +88,7 @@ return (
     {/* Related Stocks Section */}
     <div style={styles.stocksSection}>
     <div style={styles.stocksHeader}>
-        <span style={styles.stocksLabel}>연관 종목</span>
+        <span style={styles.stocksLabel}>연관종목</span>
     </div>
     <div style={styles.stocksList}>
         {relatedStocks.map((stock) => (
@@ -99,7 +99,7 @@ return (
         >
             <span style={styles.stockName}>{stock.name}</span>
             <span style={styles.stockValue}>
-            {stock.returnRate > 0 ? '+' : ''}
+            {/* {stock.returnRate > 0 ? '+' : ''} */}
             {stock.returnRate.toFixed(2)}%
             </span>
         </div>
@@ -112,24 +112,21 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-width: '90%',
-maxWidth: '420px',
-margin: '0 auto 12px auto',
+padding: '20px 16px',
 backgroundColor: '#FFFFFF',
-borderRadius: '16px',
-boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-padding: '20px',
+width: '100%',
 boxSizing: 'border-box',
+borderRadius: '4px',
 fontFamily:
     'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',
 },
 
-// Header
 header: {
 display: 'flex',
-justifyContent: 'space-between',
+justifyContent: 'flex-start',
 alignItems: 'center',
 marginBottom: '16px',
+gap:"10px"
 },
 title: {
 margin: 0,
@@ -143,7 +140,6 @@ color: '#757575',
 fontWeight: 400,
 },
 
-// Theme Tiles Grid
 themesGrid: {
 display: 'grid',
 gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
@@ -183,18 +179,22 @@ fontWeight: 700,
 color: '#1E2A78',
 },
 
-// Related Stocks Section
 stocksSection: {
 borderTop: '1px solid #F5F5F5',
 paddingTop: '16px',
 },
 stocksHeader: {
 marginBottom: '12px',
+display:'flex',
 },
 stocksLabel: {
 fontSize: '13px',
 color: '#757575',
 fontWeight: 500,
+border:'2px solid #F5F5F5',
+padding: '5px 5px',
+borderRadius:'5px',
+whiteSpace:'wrap'
 },
 stocksList: {
 display: 'flex',

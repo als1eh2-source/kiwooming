@@ -47,13 +47,12 @@ return (
 <div style={styles.container}>
     {/* Search Input Section */}
     <div style={styles.searchInputWrapper}>
-    <span style={styles.searchIcon}>🔍</span>
     
     <input
         type="text"
         value={searchText}
         onChange={handleSearchChange}
-        placeholder="종목명을 검색해주세요"
+        placeholder="키움증권"
         style={styles.input}
     />
 
@@ -90,39 +89,27 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-width: '90%',
-maxWidth: '400px',
-margin: '0 auto',
+padding: '15px 10px',
 backgroundColor: '#FFFFFF',
-borderRadius: '8px',
-boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
-padding: '16px',
+width: '100%',
 boxSizing: 'border-box',
 },
-
-// Search Input Section
 searchInputWrapper: {
 display: 'flex',
 alignItems: 'center',
-backgroundColor: '#F9FAFB',
-border: '1px solid #E5E7EB',
+backgroundColor: 'white',
+border: '2px solid #E5E7EB',
 borderRadius: '8px',
-padding: '10px 12px',
-gap: '8px',
-marginBottom: '12px',
-},
-searchIcon: {
-fontSize: '18px',
-color: '#999999',
-display: 'flex',
-alignItems: 'center',
+padding: '3px 12px',
+gap: '4px',
+marginBottom: '10px',
 },
 input: {
 flex: 1,
 border: 'none',
 backgroundColor: 'transparent',
-fontSize: '14px',
-color: '#333333',
+fontSize: '16px',
+color: '#080808ff',
 outline: 'none',
 fontFamily: 'inherit',
 },
@@ -148,13 +135,11 @@ micIcon: {
 fontSize: '18px',
 color: '#666666',
 },
-
-// Related Keywords Section
 keywordsSection: {
 display: 'flex',
 alignItems: 'center',
 gap: '8px',
-flexWrap: 'wrap',
+flexWrap: 'nowrap',
 },
 keywordsLabel: {
 fontSize: '12px',
@@ -165,7 +150,7 @@ whiteSpace: 'nowrap',
 keywordsList: {
 display: 'flex',
 gap: '8px',
-flexWrap: 'wrap',
+flexWrap: 'nowrap',
 flex: 1,
 },
 keywordTag: {

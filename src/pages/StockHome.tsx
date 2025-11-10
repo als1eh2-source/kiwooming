@@ -19,7 +19,13 @@ export default function StockHome() {
     {/* 상단 */}
     <StockHeaderBar/>
     <StockSearchBar/>
-    
+
+    {/* 컨텐츠 */}
+    <div style={{
+      display:'flex',
+      flexDirection:'column',
+      gap:'12px'
+    }}>
     <StockSummaryCard/>
     <StockInfoTabs/>
     <StockCompanyInfoCard/>
@@ -30,5 +36,6 @@ export default function StockHome() {
     <PerformanceCard/>
     <StockNewsCard/>
     <DomesticInvestmentCard/>
+    </div>
   </div>;
 }

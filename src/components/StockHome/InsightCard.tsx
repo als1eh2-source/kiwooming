@@ -50,13 +50,9 @@ return (
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-width: '90%',
-maxWidth: '420px',
-margin: '0 auto 12px auto',
+padding: '20px 16px',
 backgroundColor: '#FFFFFF',
-borderRadius: '16px',
-boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-padding: '20px',
+width: '100%',
 boxSizing: 'border-box',
 fontFamily:
     'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',

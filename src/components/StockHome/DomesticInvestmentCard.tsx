@@ -122,15 +122,15 @@ return (
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+// 현비언니! maxWidth 없애면 무한확장해여
 container: {
-width: '90%',
-maxWidth: '420px',
-margin: '0 auto 12px auto',
+width: '100%',
+maxWidth:'550px',
+margin: '0 auto',
 backgroundColor: '#FFFFFF',
-borderRadius: '16px',
-boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-padding: '20px',
+padding: '20px 16px',
 boxSizing: 'border-box',
+overflow:'hidden',
 fontFamily:
     'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',
 },

@@ -74,83 +74,96 @@ return absChange.toFixed(2);
 };
 
 return (
-<div style={styles.container}>
-    {/* 헤더 영역 */}
-    <div style={styles.header}>
-    <h3 style={styles.title}>빅데이터</h3>
-    <div style={styles.iconGroup}>
-        <button
-        onClick={handleRefresh}
-        style={styles.iconButton}
-        aria-label="새로고침"
-        >
-        <span style={styles.icon}>🔄</span>
-        </button>
-        <button
-        onClick={handleExpand}
-        style={styles.iconButton}
-        aria-label="전체보기"
-        >
-        <span style={styles.icon}>→</span>
-        </button>
-    </div>
-    </div>
-
-    {/* 카테고리 탭 */}
-    <div style={styles.tabContainer}>
-    {(['실시간 조회', '조회수 급증', '매매 상위'] as CategoryTab[]).map(
-        (tab) => (
-        <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-            ...styles.tabButton,
-            ...(activeTab === tab ? styles.activeTab : styles.inactiveTab),
-            }}
-        >
-            {tab}
-        </button>
-        )
-    )}
-    </div>
-
-    {/* 종목 리스트 */}
-    <div style={styles.stockList}>
-    {currentStocks.map((stock) => (
-        <div
-        key={stock.id}
-        onClick={() => handleStockClick(stock)}
-        style={styles.stockRow}
-        >
-        {/* 순위 */}
-        <span style={styles.rank}>{stock.rank}</span>
-
-        {/* 종목명 */}
-        <span style={styles.stockName}>{stock.name}</span>
-
-        {/* 가격 및 등락률 */}
-        <div style={styles.priceContainer}>
-            <span style={styles.price}>{formatPrice(stock.price)}</span>
-            <span
-            style={{
-                ...styles.changeRate,
-                color: stock.change >= 0 ? '#FF0000' : '#0000FF',
-            }}
+    <div style={styles.container}>
+        {/* 헤더 영역 */}
+        <div style={styles.header}>
+        <h3 style={styles.title}>빅데이터</h3>
+        <div style={styles.iconGroup}>
+            <button
+            onClick={handleRefresh}
+            style={styles.iconButton}
+            aria-label="새로고침"
             >
-            {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%
-            </span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9462 3.33214 15.3033 4.69672"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                />
+                <path
+                d="M15 2.5V5H12.5"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                />
+            </svg>
+            </button>
+            <button
+            onClick={handleExpand}
+            style={styles.iconButton}
+            aria-label="전체보기"
+            >
+            <span style={styles.icon}>&gt;</span>
+            </button>
         </div>
         </div>
-    ))}
+
+        {/* 카테고리 탭 */}
+        <div style={styles.tabContainer}>
+        {(['실시간 조회', '조회수 급증', '매매 상위'] as CategoryTab[]).map(
+            (tab) => (
+            <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                ...styles.tabButton,
+                ...(activeTab === tab ? styles.activeTab : styles.inactiveTab),
+                }}
+            >
+                {tab}
+            </button>
+            )
+        )}
+        </div>
+
+        {/* 종목 리스트 */}
+        <div style={styles.stockList}>
+        {currentStocks.map((stock) => (
+            <div
+            key={stock.id}
+            onClick={() => handleStockClick(stock)}
+            style={styles.stockRow}
+            >
+            {/* 순위 */}
+            <span style={styles.rank}>{stock.rank}</span>
+
+            {/* 종목명 */}
+            <span style={styles.stockName}>{stock.name}</span>
+
+            {/* 가격 및 등락률 */}
+            <div style={styles.priceContainer}>
+                <span style={styles.price}>{formatPrice(stock.price)}</span>
+                <span
+                style={{
+                    ...styles.changeRate,
+                    color: stock.change >= 0 ? '#DB2777': '#0000FF',
+                }}
+                >
+                {stock.change >= 0 ? '▲' : '▼'} {formatChange(stock.change)}%
+                </span>
+            </div>
+            </div>
+        ))}
+        </div>
     </div>
-</div>
 );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
-width: "90%",                     // 반응형 폭 (모바일 기준)
-maxWidth: "420px",                // 카드 최대 폭 제한
+width: "100%",                   
 margin: "0 auto 20px auto",       // 가운데 정렬 + 아래쪽 간격
 backgroundColor: "#FFFFFF",
 borderRadius: "16px",
@@ -162,7 +175,8 @@ header: {
 display: 'flex',
 justifyContent: 'space-between',
 alignItems: 'center',
-marginBottom: '16px',
+padding:"10px 0px",
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) "
 },
 title: {
 margin: 0,
@@ -191,19 +205,24 @@ display: 'block',
 },
 tabContainer: {
 display: 'flex',
+alignItems:"center",
+justifyContent:"center",
 gap: '8px',
-marginBottom: '16px',
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) ",
+height:"52px"
 },
 tabButton: {
 flex: 1,
 border: 'none',
-borderRadius: '20px',
-padding: '10px 12px',
+borderRadius: '7px',
+padding: '5px 10px',
+height:"30px",
 fontSize: '13px',
 fontWeight: 500,
 cursor: 'pointer',
 transition: 'all 0.2s ease',
-whiteSpace: 'nowrap',
+alignSelf:"center",
+whiteSpace: 'nowrap'
 },
 activeTab: {
 backgroundColor: '#1E2A78',
@@ -216,14 +235,17 @@ color: '#999999',
 stockList: {
 display: 'flex',
 flexDirection: 'column',
-gap: '14px',
+justifyContent:"space-between",
+gap:'10px'
 },
 stockRow: {
 display: 'flex',
 alignItems: 'center',
 gap: '12px',
 cursor: 'pointer',
-padding: '4px 0',
+borderBottom:"1px solid rgba(0, 0, 0, 0.08) ",
+height:"52px",
+boxSizing:"border-box"
 },
 rank: {
 fontSize: '14px',
@@ -231,26 +253,27 @@ color: '#999999',
 fontWeight: 500,
 minWidth: '20px',
 textAlign: 'center',
+lineHeight:'1'
 },
 stockName: {
 flex: 1,
 fontSize: '14px',
 color: '#000000',
 fontWeight: 500,
+alignItems:"center"
 },
 priceContainer: {
 display: 'flex',
-flexDirection: 'column',
-alignItems: 'flex-end',
-gap: '4px',
+alignItems: 'center',
+gap: '10px',
 },
 price: {
 fontSize: '14px',
-color: '#000000',
-fontWeight: 700,
+color: '#DB2777',
+fontWeight: 500,
 },
 changeRate: {
-fontSize: '12px',
-fontWeight: 600,
+fontSize: '14px',
+fontWeight: 500,
 },
 };
