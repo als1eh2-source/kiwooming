@@ -10,6 +10,7 @@
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
     "axios": "^1.13.2",
+    "lightweight-charts": "^5.0.9",
     "lucide-react": "^0.553.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
