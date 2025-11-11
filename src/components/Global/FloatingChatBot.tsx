@@ -18,7 +18,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
 
   const [visible, setVisible] = useState(true);
   const [position, setPosition] = useState<Pos>({
-    x: window.innerWidth - ICON_W - 430,
+    x: window.innerWidth - ICON_W -430,
     y: window.innerHeight - ICON_H - 45,
   });
   const [isOpen, setIsOpen] = useState(false);
