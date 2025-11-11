@@ -1,22 +1,20 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { ChartData } from "../../Data/ChartData";
 
 interface CandleData {
-  dt: string;
+  dt: string;        // "20251030" 같은 yyyymmdd
   open_pric: number;
   high_pric: number;
   low_pric: number;
-  cur_prc: number;
+  cur_prc: number;   // 종가
   trde_qty: number;
 }
 
 const rawData = ChartData.stk_dt_pole_chart_qry || [];
-
-// 최신 날짜가 오른쪽으로 가도록 역순 정렬
 const Candles: CandleData[] = [...rawData]
   .reverse()
   .map((item: any) => ({
-    dt: item.dt,
+    dt: String(item.dt),
     open_pric: +item.open_pric,
     high_pric: +item.high_pric,
     low_pric: +item.low_pric,
@@ -24,8 +22,8 @@ const Candles: CandleData[] = [...rawData]
     trde_qty: +item.trde_qty,
   }));
 
-// 이동평균 계산 함수 (SMA)
-const calcMA = (data: any[], key: string, period: number) => {
+// 단순 이동평균 계산
+const calcMA = (data: any[], key: keyof CandleData, period: number) => {
   const result: number[] = [];
   for (let i = 0; i < data.length; i++) {
     if (i < period - 1) {
@@ -33,13 +31,14 @@ const calcMA = (data: any[], key: string, period: number) => {
       continue;
     }
     const slice = data.slice(i - period + 1, i + 1);
-    const avg = slice.reduce((sum, d) => sum + d[key], 0) / slice.length;
+    const avg =
+      slice.reduce((sum: number, d: CandleData) => sum + (d[key] as number), 0) /
+      slice.length;
     result.push(avg);
   }
   return result;
 };
 
-// 이동평균선
 const ma5 = calcMA(Candles, "cur_prc", 5);
 const ma10 = calcMA(Candles, "cur_prc", 10);
 const ma20 = calcMA(Candles, "cur_prc", 20);
@@ -49,13 +48,26 @@ const ma120 = calcMA(Candles, "cur_prc", 120);
 const prices = Candles.flatMap((c) => [c.high_pric, c.low_pric]);
 const maxPrice = Math.max(...prices);
 const minPrice = Math.min(...prices);
+
 const volumes = Candles.map((c) => c.trde_qty);
 const maxVolume = Math.max(...volumes);
 
-const yScalePrice = (v: number) =>
-  350 - ((v - minPrice) / (maxPrice - minPrice)) * 320;
-const yScaleVolume = (v: number) => 150 - (v / maxVolume) * 100;
+// 스케일러
+const PRICE_HEIGHT = 360;
+const priceTopPad = 40;
+const priceInnerH = PRICE_HEIGHT - priceTopPad - 10;
 
+const yScalePrice = (v: number) =>
+  priceTopPad + (1 - (v - minPrice) / (maxPrice - minPrice)) * priceInnerH;
+
+const VOL_HEIGHT = 160;
+const volBottomPad = 10;
+const volInnerH = VOL_HEIGHT - volBottomPad - 10;
+
+const yScaleVolume = (v: number) =>
+  10 + (1 - v / maxVolume) * volInnerH;
+
+// 색상
 const lineColors = {
   ma5: "#ff4444",
   ma10: "#ff9800",
@@ -64,17 +76,70 @@ const lineColors = {
   ma120: "#9c27b0",
 };
 
+// yyyymmdd → "MM/DD"
+const prettyMD = (yyyymmdd: string) =>
+  `${yyyymmdd.slice(4, 6)}/${yyyymmdd.slice(6, 8)}`;
+
 export const ChartCanvas: React.FC = () => {
-  const makePolylinePoints = (arr: number[], yScale: (v: number) => number) =>
-    arr
-      .map((v, i) => (isNaN(v) ? "" : `${40 + i * 28},${yScale(v).toFixed(1)}`))
-      .filter((v) => v !== "")
-      .join(" ");
-
-  const dateTicks = Candles.filter((_, i) => i % 5 === 0);
-
+  const [xGap] = useState(15);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollRef2 = useRef<HTMLDivElement>(null);
+
+  // 현재 화면 구간 기준 최고/최저
+  const [visibleHi, setVisibleHi] = useState<number | null>(null);
+  const [visibleLo, setVisibleLo] = useState<number | null>(null);
+  const [visibleHiIdx, setVisibleHiIdx] = useState<number | null>(null);
+  const [visibleLoIdx, setVisibleLoIdx] = useState<number | null>(null);
+
+  // 드래그 스크롤 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollStart, setScrollStart] = useState(0);
+
+  const svgWidth = Candles.length * xGap + 70;
+
+  // 최초 오른쪽 끝으로 이동
+  useEffect(() => {
+    if (scrollRef.current && scrollRef2.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+      scrollRef2.current.scrollLeft = scrollRef2.current.scrollWidth;
+      updateVisibleExtremes(); // 초기 표시
+    }
+  }, []);
+
+  // 화면 구간 내 최고/최저 계산
+  const updateVisibleExtremes = () => {
+    if (!scrollRef.current) return;
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const clientWidth = scrollRef.current.clientWidth;
+
+    const startIdx = Math.floor(scrollLeft / xGap);
+    const endIdx = Math.min(
+      Candles.length,
+      Math.ceil((scrollLeft + clientWidth) / xGap)
+    );
+
+    const visible = Candles.slice(startIdx, endIdx);
+    if (visible.length === 0) return;
+
+    let hi = -Infinity, lo = Infinity;
+    let hiIdx = startIdx, loIdx = startIdx;
+    visible.forEach((c, i) => {
+      if (c.high_pric > hi) {
+        hi = c.high_pric;
+        hiIdx = startIdx + i;
+      }
+      if (c.low_pric < lo) {
+        lo = c.low_pric;
+        loIdx = startIdx + i;
+      }
+    });
+
+    setVisibleHi(hi);
+    setVisibleLo(lo);
+    setVisibleHiIdx(hiIdx);
+    setVisibleLoIdx(loIdx);
+  };
 
   // 스크롤 동기화
   const syncScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -84,13 +149,43 @@ export const ChartCanvas: React.FC = () => {
     } else {
       scrollRef.current.scrollLeft = scrollRef2.current.scrollLeft;
     }
+    updateVisibleExtremes();
   };
 
-  // 실제 데이터 개수에 맞춘 SVG width
-  const svgWidth = Candles.length * 28 + 70;
+  // 드래그 스크롤
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setScrollStart(scrollRef.current.scrollLeft);
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current || !scrollRef2.current) return;
+    const dx = e.clientX - startX;
+    const next = scrollStart - dx;
+    scrollRef.current.scrollLeft = next;
+    scrollRef2.current.scrollLeft = next;
+    updateVisibleExtremes();
+  };
+  const endDrag = () => setIsDragging(false);
+
+  const makePolylinePoints = (arr: number[], yScale: (v: number) => number) =>
+    arr
+      .map((v, i) => (isNaN(v) ? "" : `${40 + i * xGap},${yScale(v).toFixed(1)}`))
+      .filter(Boolean)
+      .join(" ");
+
+  const dateTicks = Candles.filter((_, i) => i % 5 === 0);
+  const xAt = (i: number) => 40 + i * xGap;
 
   return (
-    <div style={styles.container}>
+    <div
+      style={{ ...styles.container, cursor: isDragging ? "grabbing" : "grab" }}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={endDrag}
+      onMouseLeave={endDrag}
+    >
       {/* 상단 범례 */}
       <div style={styles.legendWrapper}>
         <div style={styles.indicators}>
@@ -106,65 +201,45 @@ export const ChartCanvas: React.FC = () => {
       </div>
 
       {/* 가격 차트 */}
-      <div ref={scrollRef} onScroll={syncScroll} style={styles.scrollWrapper}>
-        <svg width={svgWidth} height="360" style={styles.svg}>
+      <div ref={scrollRef} onScroll={syncScroll} style={styles.scrollWrapper} className="scrollWrapper">
+        <svg width={svgWidth} height={PRICE_HEIGHT} style={styles.svg}>
+          {/* 그리드 */}
           {Array.from({ length: 5 }).map((_, i) => {
-            const y = 40 + i * 70;
+            const y = priceTopPad + (i * priceInnerH) / 4;
             return (
-              <line
-                key={i}
-                x1={40}
-                y1={y}
-                x2={svgWidth}
-                y2={y}
-                stroke="#eee"
-                strokeWidth="0.7"
-              />
+              <line key={i} x1={40} y1={y} x2={svgWidth} y2={y} stroke="#eee" strokeWidth="0.7" />
             );
           })}
 
           {/* 이동평균선 */}
-          <polyline
-            points={makePolylinePoints(ma5, yScalePrice)}
-            fill="none"
-            stroke={lineColors.ma5}
-            strokeWidth="1.2"
-          />
-          <polyline
-            points={makePolylinePoints(ma10, yScalePrice)}
-            fill="none"
-            stroke={lineColors.ma10}
-            strokeWidth="1.2"
-          />
-          <polyline
-            points={makePolylinePoints(ma20, yScalePrice)}
-            fill="none"
-            stroke={lineColors.ma20}
-            strokeWidth="1.2"
-          />
-          <polyline
-            points={makePolylinePoints(ma60, yScalePrice)}
-            fill="none"
-            stroke={lineColors.ma60}
-            strokeWidth="1.2"
-          />
-          <polyline
-            points={makePolylinePoints(ma120, yScalePrice)}
-            fill="none"
-            stroke={lineColors.ma120}
-            strokeWidth="1.2"
-          />
+          {(
+            [
+              ["ma5", ma5],
+              ["ma10", ma10],
+              ["ma20", ma20],
+              ["ma60", ma60],
+              ["ma120", ma120],
+            ] as const
+          ).map(([k, arr]) => (
+            <polyline
+              key={k}
+              points={makePolylinePoints(arr, yScalePrice)}
+              fill="none"
+              stroke={lineColors[k as keyof typeof lineColors]}
+              strokeWidth="1.2"
+            />
+          ))}
 
           {/* 캔들 */}
           {Candles.map((c, i) => {
-            const x = 40 + i * 28;
+            const x = xAt(i);
             const isRise = c.cur_prc >= c.open_pric;
             const high = yScalePrice(c.high_pric);
             const low = yScalePrice(c.low_pric);
             const open = yScalePrice(c.open_pric);
             const close = yScalePrice(c.cur_prc);
             const bodyTop = Math.min(open, close);
-            const bodyHeight = Math.max(Math.abs(open - close), 2);
+            const bodyH = Math.max(Math.abs(open - close), 2);
             return (
               <g key={i}>
                 <line
@@ -173,41 +248,70 @@ export const ChartCanvas: React.FC = () => {
                   x2={x}
                   y2={low}
                   stroke={isRise ? "#ff4444" : "#2196F3"}
-                  strokeWidth="1.3"
+                  strokeWidth="1.2"
                 />
                 <rect
-                  x={x - 6}
+                  x={x - xGap / 4}
                   y={bodyTop}
-                  width="12"
-                  height={bodyHeight}
+                  width={xGap / 2}
+                  height={bodyH}
                   fill={isRise ? "#ff4444" : "#2196F3"}
                   stroke="#fff"
-                  strokeWidth="0.5"
+                  strokeWidth="0.4"
+                  rx={1}
                 />
               </g>
             );
           })}
 
-          {/* 날짜 표시 */}
-          {dateTicks.map((c, i) => (
-            <text
-              key={i}
-              x={40 + i * 28 * 5}
-              y={355}
-              fontSize="10"
-              fill="#666"
-              textAnchor="middle"
-            >
-              {`${c.dt.slice(5, 7)}/${c.dt.slice(7, 9)}`}
+          {/* 날짜 눈금 */}
+          {dateTicks.map((c, idx) => (
+            <text key={idx} x={40 + idx * xGap * 5} y={PRICE_HEIGHT - 5} fontSize="10" fill="#666" textAnchor="middle">
+              {prettyMD(c.dt)}
             </text>
           ))}
+
+          {/* 현재 보이는 구간 최고/최저 */}
+          {visibleHiIdx !== null && visibleHi !== null && (
+            <>
+              <line
+                x1={xAt(visibleHiIdx)}
+                y1={yScalePrice(visibleHi)}
+                x2={xAt(visibleHiIdx) + 40}
+                y2={yScalePrice(visibleHi)}
+                stroke="#d32f2f"
+                strokeDasharray="3 3"
+                strokeWidth="1"
+              />
+              <text x={xAt(visibleHiIdx) + 44} y={yScalePrice(visibleHi) + 3} fontSize="12" fill="#d32f2f">
+                최고 {visibleHi.toLocaleString()}
+              </text>
+            </>
+          )}
+
+          {visibleLoIdx !== null && visibleLo !== null && (
+            <>
+              <line
+                x1={xAt(visibleLoIdx)}
+                y1={yScalePrice(visibleLo)}
+                x2={xAt(visibleLoIdx) + 40}
+                y2={yScalePrice(visibleLo)}
+                stroke="#1976d2"
+                strokeDasharray="3 3"
+                strokeWidth="1"
+              />
+              <text x={xAt(visibleLoIdx) + 44} y={yScalePrice(visibleLo) + 3} fontSize="12" fill="#1976d2">
+                최저 {visibleLo.toLocaleString()}
+              </text>
+            </>
+          )}
         </svg>
       </div>
 
-      {/* 오른쪽 Y축 고정 */}
+      {/* 오른쪽 고정 Y축 */}
       <div style={styles.fixedYAxis}>
         {Array.from({ length: 5 }).map((_, i) => {
-          const y = 40 + i * 70;
+          const y = priceTopPad + (i * priceInnerH) / 4;
           const price = maxPrice - ((maxPrice - minPrice) / 4) * i;
           return (
             <div key={i} style={{ position: "absolute", top: y, right: 0 }}>
@@ -217,44 +321,76 @@ export const ChartCanvas: React.FC = () => {
         })}
       </div>
 
-      {/* 거래량 차트 */}
-      <div ref={scrollRef2} onScroll={syncScroll} style={styles.scrollWrapper}>
-        <svg width={svgWidth} height="160" style={styles.svg}>
+      {/* 상단 범례 */}
+      <div style={styles.legendWrapper}>
+        <div style={styles.indicators}>
+          <div style={styles.indicatorRow}>
+            <span style={styles.indicatorLabel}>거래량 단순</span>
+            <span style={styles.indicatorValue5}>5</span>
+            <span style={styles.indicatorValue10}>10</span>
+            <span style={styles.indicatorValue20}>20</span>
+            <span style={styles.indicatorValue60}>60</span>
+            <span style={styles.indicatorValue120}>120</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 거래량 */}
+      <div ref={scrollRef2} onScroll={syncScroll} style={styles.scrollWrapper} className="scrollWrapper">
+        <svg width={svgWidth} height={VOL_HEIGHT} style={styles.svg}>
           {Candles.map((c, i) => {
-            const x = 40 + i * 28;
+            const x = 40 + i * xGap;
             const isRise = c.cur_prc >= c.open_pric;
-            const h = 150 - yScaleVolume(c.trde_qty);
+            const y = yScaleVolume(c.trde_qty);
+            const h = VOL_HEIGHT - volBottomPad - y;
             return (
               <rect
                 key={i}
-                x={x - 6}
-                y={yScaleVolume(c.trde_qty)}
-                width="12"
+                x={x - xGap / 4}
+                y={y}
+                width={xGap / 2}
                 height={h}
                 fill={isRise ? "#ff4444" : "#2196F3"}
-                opacity="0.8"
+                opacity="0.85"
               />
             );
           })}
+
+          {/* 거래량 이동평균선 */}
+          {[["#ff44aa", calcMA(Candles, "trde_qty" as any, 5)], ["#ff9800", calcMA(Candles, "trde_qty" as any, 20)]].map(
+            ([color, arr], idx) => (
+              <polyline
+                key={idx}
+                points={makePolylinePoints(arr as number[], yScaleVolume)}
+                fill="none"
+                stroke={color as string}
+                strokeWidth="1"
+                opacity="0.9"
+              />
+            )
+          )}
         </svg>
       </div>
+
+      {/* 스크롤바 숨김 */}
+      <style>{`.scrollWrapper::-webkit-scrollbar { display: none; }`}</style>
     </div>
   );
 };
 
-// === 스타일 ===
-const styles: { [key: string]: React.CSSProperties } = {
+const styles: { [k: string]: React.CSSProperties } = {
   container: {
     backgroundColor: "#fff",
     flex: 1,
     height: "100%",
     overflow: "hidden",
     position: "relative",
+    userSelect: "none",
   },
   legendWrapper: { display: "flex", justifyContent: "space-between" },
   indicators: { padding: "8px 12px" },
   indicatorRow: { display: "flex", alignItems: "center", gap: "4px" },
-  indicatorLabel: { fontSize: "10px", color: "hotpink", fontWeight: "700" },
+  indicatorLabel: { fontSize: "10px", color: "hotpink", fontWeight: 700 },
   indicatorValue5: { fontSize: "10px", color: "#ff4444" },
   indicatorValue10: { fontSize: "10px", color: "#ff9800" },
   indicatorValue20: { fontSize: "10px", color: "#4caf50" },
@@ -266,25 +402,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflowY: "hidden",
     width: "100%",
     position: "relative",
-    scrollbarWidth: "thin",
-    scrollSnapType: "x mandatory",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
   },
   fixedYAxis: {
     position: "absolute",
-    right: "0px",
-    top: "80px",
-    width: "60px",
-    height: "360px",
-    background:
-      "linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0.6))",
+    right: 0,
+    top: 30,
+    width: 60,
+    height: PRICE_HEIGHT,
+    background: "transparent",
     pointerEvents: "none",
     zIndex: 10,
   },
   yText: {
-    fontSize: "10px",
+    fontSize: 10,
     color: "#666",
     position: "absolute",
-    right: "5px",
+    right: 5,
     transform: "translateY(-50%)",
   },
 };
