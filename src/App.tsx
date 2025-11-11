@@ -52,16 +52,10 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/stockhome" element={<StockHome />} />
             <Route path="/newsdetail" element={<NewsDetail />} />
-            <Route
-              path="/quote"
-              element={<Quote onShowKiwooming={() => setShowKiwooming(true)} />}
-            />
-            <Route
-              path="/quote/:symbol"
-              element={<Quote onShowKiwooming={() => setShowKiwooming(true)} />}
-            />
+            <Route path="/quote"/>
+            <Route path="/quote/:symbol"/>
             <Route path="/order" element={<Order />} />
-            <Route path="/chart" element={<Chart />} />
+            <Route path="/chart" element={<Chart onShowKiwooming={() => setShowKiwooming(true)}/>}/>
             <Route path="/account" element={<Account />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

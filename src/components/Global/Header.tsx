@@ -7,14 +7,14 @@ interface HeaderProps {
   tabs: string[];
   defaultTab?: string;
   onTabChange?: (tab: string) => void;
-  onShowKiwooming?: () => void; // ✅ 키우밍 불러오기 prop
+  onShowKiwooming?: () => void; 
 }
 
 export const Header: React.FC<HeaderProps> = ({
   tabs,
   defaultTab,
   onTabChange,
-  onShowKiwooming, // ✅ prop 받기
+  onShowKiwooming, // 
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]);
   const [showMenu, setShowMenu] = useState(false);
@@ -109,14 +109,14 @@ export const Header: React.FC<HeaderProps> = ({
               시세 설정 <span style={styles.menuTag}>[통합]</span>
             </div>
             <hr style={styles.divider} />
-            <div style={styles.menuItem}>호가 설정</div>
-            <div style={styles.menuItem}>중간가 보기</div>
+            <div style={styles.menuItem}>평균매입가 설정</div>
+            <div style={styles.menuItem}>사용자지표 내려받기</div>
+            <div style={styles.menuItem}>보조지표 내려받기</div>
             <hr style={styles.divider} />
             <div style={styles.menuItem}>MY알림</div>
             <div style={styles.menuItem}>내맘대로 등록</div>
             <div style={styles.menuItem}>화면 공유</div>
 
-            {/* ✅ 키우밍 불러오기 */}
             <div
               style={{
                 ...styles.menuItem,
@@ -150,7 +150,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: "flex",
     alignItems: "center",
     padding: "12px 8px",
-    gap: "12px",
+    gap: "10px",
   },
   backButton: {
     background: "none",
@@ -201,12 +201,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   menuContent: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "4px",
     animation: "fadeIn 0.2s ease-in-out",
   },
   menuItem: {
     padding: "10px 16px",
-    fontSize: "14px",
+    fontSize: "12px",
     color: "#333",
     display: "flex",
     cursor: "pointer",

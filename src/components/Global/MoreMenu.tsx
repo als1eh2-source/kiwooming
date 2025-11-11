@@ -3,7 +3,7 @@ import React from "react";
 interface MoreMenuProps {
 show: boolean;
 onClose: () => void;
-children?: React.ReactNode; // ✅ 안쪽 내용 props로 전달
+children?: React.ReactNode; // 안쪽 내용 props로 전달
 position?: { top?: number; right?: number };
 }
 

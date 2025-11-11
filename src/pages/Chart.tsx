@@ -6,10 +6,18 @@ import { Header } from '../components/Global/Header';
 import { Footer } from '../components/Global/Footer';
 // src/pages/Chart.tsx
 // [신규] 차트 페이지 최소 템플릿
-export default function Chart() {
+
+interface ChartProps {
+  onShowKiwooming: () => void;
+}
+
+const Chart: React.FC<ChartProps> = ({ onShowKiwooming }) => {
   return (
     <div style={styles.container}>
-      <Header tabs={['종목차트', '재무차트', '지수차트']} defaultTab="종목차트"/>
+      <Header tabs={['종목차트', '재무차트', '지수차트']} 
+      defaultTab="종목차트"
+      onShowKiwooming={onShowKiwooming}  
+      />
       <main style={styles.main}>
         <ChartDisplay />
         <ChartControls />
@@ -39,3 +47,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
   },
 };
+
+export default Chart;
