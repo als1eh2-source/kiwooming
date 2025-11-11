@@ -30,6 +30,16 @@ const handleSourceClick = () => {
 console.log('Navigate to Kiwoom Securities');
 };
 
+const articleText = `
+큐리오시스, 청약 경쟁률 2천204대 1...증거금 7조3천억원
+(서울=연합뉴스) 배영경 기자 = 코스닥시장 상장을 추진 중인 실험실 자동화(랩오토메이션) 전문 기업 큐리오시스가 지난 4일부터 이틀간 기관 투자자를 대상으로 실행한 공모주 청약에서 2천204대 1의 경쟁률을 달성했고 5일 발표다.
+일반 투자자에 30만주를 배정할 계획인 가운데 6946천만주 이상이 청약 조건을 맞 7조2천700억원으로 집계됐다.
+큐리오시스는 남입을 거쳐 오는 13일 코스닥시장에 상장할 예정이다.
+상장 주관사는 키움증권[039490]이 맡았다.
+큐리오시스는 입상의약품 R&D 시설에 쓰이는 자동화 설비와 관련 소프트웨어를 만드는 곳이다. 삶의 자동화 설비의 관련 소프트웨어를 만드는 제품인 '셀로카'가 대표 상품이다.
+ykbae@yna.co.kr
+`;
+
 return (
 <div style={styles.pageContainer}>
     {/* Header */}
@@ -70,36 +80,9 @@ return (
     <div style={styles.divider} />
 
     {/* Article Body */}
-    <div style={styles.articleBody}>
-        <p style={styles.paragraph}>
-        큐리오시스, 청약 경쟁률 2천204대 1...증거금 7조3천억원
-        </p>
-
-        <p style={styles.paragraph}>
-        (서울=연합뉴스) 배영경 기자 = 코스닥시장 상장을 추진 중인 실험실 자동화(랩오토메이션) 전문 기업 큐리오시스가 지난 4일부터 이틀간 기관 투자자를 대상으로 실행한 공모주 청약에서 2천204대 1의 경쟁률을 달성했고 5일 발표다.
-        </p>
-
-        <p style={styles.paragraph}>
-        일반 투자자에 30만주를 배정할 계획인 가운데 6946천만주 이상이 청약 조건을 맞 7조2천700억원으로 집계됐다.
-        </p>
-
-        <p style={styles.paragraph}>
-        큐리오시스는 남입을 거쳐 오는 13일 코스닥시장에 상장할 예정이다.
-        </p>
-
-        <p style={styles.paragraph}>
-        상장 주관사는 키움증권[039490]이 맡았다.
-        </p>
-
-        <p style={styles.paragraph}>
-        큐리오시스는 입상의약품 R&D 시설에 쓰이는 자동화 설비와 관련 소프트웨어를 만드는 곳이다. 삶의 자동화 설비의 관련 소프트웨어를 만드는 제품인 '셀로카가 대표 상품이다.
-        </p>
-
-        <p style={styles.paragraph}>
-        ykbae@yna.co.kr
-        </p>
-
-    </div>
+    <p style={{ whiteSpace: "pre-line", lineHeight: 1.6, color: "#333" }}>
+    {articleText}
+    </p>
     </div>
 
     {/* Fixed Bottom Button */}

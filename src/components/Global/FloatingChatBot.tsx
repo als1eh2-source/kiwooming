@@ -123,7 +123,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     setInput("");
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/chat", {
+      const res = await axios.post("https://kiwooming-backend.onrender.com/chat", {
         text: input,
         context: currentPath,
       });
