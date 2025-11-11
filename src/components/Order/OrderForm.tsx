@@ -1,28 +1,33 @@
 // src/components/Order/OrderForm.tsx
 import React from 'react';
+import { currentPrice, toOrderBookRows } from '../../Data/QuoteData';
 
-interface OrderBookRow { price: number; quantity: number; }
+interface ViewRow { price: number; quantity: number; }
 
-const CURRENT_PRICE = 282000;
 const SYMBOL = '키움증권';
 const ROW_H = 60; // 왼쪽 호가 리스트 한 행 고정 높이(약 9행 고정 뷰)
 
-const makeOrderBook = (): OrderBookRow[] => {
-  const rows: OrderBookRow[] = [];
-  for (let i = 7; i >= 1; i--) rows.push({ price: CURRENT_PRICE + i * 500, quantity: Math.floor(Math.random() * 900) + 10 });
-  rows.push({ price: CURRENT_PRICE, quantity: Math.floor(Math.random() * 900) + 10 });
-  for (let i = 1; i <= 7; i++) rows.push({ price: CURRENT_PRICE - i * 500, quantity: Math.floor(Math.random() * 900) + 10 });
-  return rows;
-};
-const orderBookRows = makeOrderBook();
-const maxQty = Math.max(...orderBookRows.map(r => r.quantity));
+// === QuoteData 연동: 호가/잔량 로딩 ===
+const book = toOrderBookRows(); // [{ price, askQty, bidQty }]
+// 현재가 포함 위쪽(매도)은 askQty, 아래쪽(매수)은 bidQty 사용
+const currentIndex = book.findIndex(r => r.price === currentPrice);
+const start = Math.max(0, currentIndex - 7);               // 위로 7개
+const end   = Math.min(book.length, currentIndex + 1 + 8);  // (현재가 포함) + 아래로 8개
+const visibleBook = book.slice(start, end);
+const orderBookRows: ViewRow[] = visibleBook.map(r => ({
+  price: r.price,
+  quantity: r.price >= currentPrice ? r.askQty : r.bidQty,
+}));
+
+// 막대 비율 산정도 화면에 보이는 구간 기준으로
+const maxQty = Math.max(1, ...visibleBook.map(r => Math.max(r.askQty, r.bidQty)));
 
 export const OrderForm: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<'매수'|'매도'|'정정/취소'|'미체결'|'잔고'>('매수');
   const [orderType, setOrderType] = React.useState<'현금'|'신용'>('현금');
   const [priceType] = React.useState('보통(지정가)');
   const [quantity, setQuantity] = React.useState(1);
-  const [price, setPrice] = React.useState(CURRENT_PRICE);
+  const [price, setPrice] = React.useState(currentPrice);
   const [useMargin, setUseMargin] = React.useState(false);
   const [autoPrice, setAutoPrice] = React.useState(false);
   const [percentDropdownOpen, setPercentDropdownOpen] = React.useState(false);
@@ -32,13 +37,21 @@ export const OrderForm: React.FC = () => {
   const [showToast, setShowToast] = React.useState(false);
   const [hoverPrice, setHoverPrice] = React.useState<number | null>(null);
 
+  // ✅ [추가] 신용 클릭 시에만 노출되는 3열 드롭다운 상태
+  const [creditOpen, setCreditOpen] = React.useState(false);
+  const [creditType, setCreditType] = React.useState<'융자' | '대주상환'>('융자');
+
   const onPickBook = (p: number) => setPrice(p);
   const handleSubmit = () => setShowConfirm(true);
-  const handleConfirm = () => { setShowConfirm(false); setShowToast(true); window.setTimeout(() => setShowToast(false), 2000); };
+  const handleConfirm = () => {
+    setShowConfirm(false);
+    setShowToast(true);
+    window.setTimeout(() => setShowToast(false), 2000);
+  };
 
-  const rowBg1stCol = (p: number): React.CSSProperties => (p >= CURRENT_PRICE ? styles.bgSky : styles.bgPink);
+  const rowBg1stCol = (p: number): React.CSSProperties => (p >= currentPrice ? styles.bgSky : styles.bgPink);
   const priceColor = (p: number): React.CSSProperties =>
-    p === CURRENT_PRICE ? styles.txtBlack : (p > CURRENT_PRICE ? styles.txtUp : styles.txtDown);
+    p === currentPrice ? styles.txtBlack : (p > currentPrice ? styles.txtUp : styles.txtDown);
 
   return (
     <div style={styles.container}>
@@ -57,7 +70,7 @@ export const OrderForm: React.FC = () => {
 
       {/* 메인 2열 */}
       <div style={styles.mainContent}>
-        {/* Left: 2:1, 왼쪽만 스크롤 */}
+        {/* Left: 2:1, 왼쪽만 스크롤 — QuoteData 기반 호가/잔량 */}
         <div style={styles.orderBookSection}>
           <div style={styles.orderBookHeader}>
             <span style={styles.headerLabel}>호가</span>
@@ -66,7 +79,7 @@ export const OrderForm: React.FC = () => {
 
           <div style={styles.orderBook}>
             {orderBookRows.map((row) => {
-              const isCurrent = row.price === CURRENT_PRICE;
+              const isCurrent = row.price === currentPrice;
               const barWidth = Math.max(0.06, row.quantity / maxQty);
               return (
                 <div key={row.price} style={styles.orderRow} onClick={() => onPickBook(row.price)}>
@@ -89,15 +102,13 @@ export const OrderForm: React.FC = () => {
                   {/* 2열: 잔량 숫자 + 왼쪽 막대 (배경 없음) */}
                   <div style={styles.qtyCell}>
                     <div
-  style={{
-    ...styles.qtyBarLeft,
-    ...(row.price >= CURRENT_PRICE
-      ? styles.qtyBarAbove
-      : styles.qtyBarBelow),
-    width: `${Math.min(1, barWidth) * 100}%`,
-  }}
-/>
-                    <span style={styles.qtyNumber}>{row.quantity}</span>
+                      style={{
+                        ...styles.qtyBarLeft,
+                        ...(row.price >= currentPrice ? styles.qtyBarAbove : styles.qtyBarBelow),
+                        width: `${Math.min(1, barWidth) * 100}%`,
+                      }}
+                    />
+                    <span style={styles.qtyNumber}>{row.quantity.toLocaleString()}</span>
                   </div>
                 </div>
               );
@@ -105,21 +116,55 @@ export const OrderForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: 3열 그리드 (기존 레이아웃 유지) */}
+        {/* Right: 3열 그리드 (기존 레이아웃/툴 유지) */}
         <div style={styles.orderEntrySection}>
-          {/* 1행: (1~2열 병합) 현금|신용 */}
+          {/* 1행: (1~2열 병합) 현금|신용 + 3열 조건부 드롭다운 */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBox}>
               <button
                 style={{ ...styles.cellButtonTightLeft, ...(orderType === '현금' ? styles.cellButtonActive : {}) }}
-                onClick={() => setOrderType('현금')}
+                onClick={() => { setOrderType('현금'); setCreditOpen(false); }}
               >현금</button>
               <button
                 style={{ ...styles.cellButtonTightRight, ...(orderType === '신용' ? styles.cellButtonActive : {}) }}
                 onClick={() => setOrderType('신용')}
               >신용</button>
             </div>
-            <div />
+
+            {/* ✅ 신용일 때만 3열에 '융자/대주상환' 드롭다운 표시 */}
+            {orderType === '신용' ? (
+              <div style={{ position: 'relative' }}>
+                <button
+                  style={styles.percentDropdown}
+                  onClick={() => setCreditOpen(!creditOpen)}
+                  aria-haspopup="listbox"
+                  aria-expanded={creditOpen}
+                >
+                  <span>{creditType}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+
+                {creditOpen && (
+                  <div style={styles.percentMenu} role="listbox">
+                    {(['융자', '대주상환'] as const).map(opt => (
+                      <button
+                        key={opt}
+                        style={{ ...styles.percentOption, ...(creditType === opt ? styles.percentOptionActive : {}) }}
+                        onClick={() => { setCreditType(opt); setCreditOpen(false); }}
+                        role="option"
+                        aria-selected={creditType === opt}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div />  /* 현금일 때는 기존과 동일하게 빈칸 */
+            )}
           </div>
 
           {/* 2행: (1~2열 병합) 텍스트 좌/토글 우 */}
@@ -185,7 +230,7 @@ export const OrderForm: React.FC = () => {
             <button style={styles.smallButton}>가능</button>
           </div>
 
-          {/* 5행: (1~2열 병합) - | 가격 | +  / 3열: 시장가 */}
+          {/* 5행: (1~2열 병합) - | 가격(클릭 반영) | +  / 3열: 시장가 */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBoxRatio}>
               <button style={styles.smallMinus} onClick={() => setPrice(price - 500)}>−</button>
@@ -209,6 +254,7 @@ export const OrderForm: React.FC = () => {
           {/* 아래로 밀기 → 8/9행이 footer와 맞닿아 보이도록 */}
           <div style={styles.bottomSpacer} />
           <div style={styles.rowEmpty} />
+          <div style={styles.rowEmpty} />
 
           {/* 8행: SOR 주문금액(= 가격 × 수량) */}
           <div style={styles.rowBottom}>
@@ -224,7 +270,7 @@ export const OrderForm: React.FC = () => {
         </div>
       </div>
 
-      {/* 확인 모달 */}
+      {/* 확인 모달 (showConfirm) */}
       {showConfirm && (
         <>
           <div style={styles.modalBackdrop} onClick={() => setShowConfirm(false)} />
@@ -251,30 +297,29 @@ export const OrderForm: React.FC = () => {
         </>
       )}
 
-      {/* 상단 토스트 */}
+      {/* 상단/하단 토스트 */}
       {showToast && (
-  <>
-    {/* 위쪽: 매수 체결 */}
-    <div style={styles.toastTop}>
-  <span style={styles.toastTitle}>매수 체결 [KRX]</span>
-  <div style={styles.toastInfoRow}>
-    <span style={styles.toastSymbol}>{SYMBOL}</span>
-    <span style={styles.toastPrice}>{price.toLocaleString()}원</span>
-    <span style={styles.toastQty}>{quantity.toLocaleString()}주</span>
-  </div>
-</div>
-
-{/* 아래쪽: 주문 완료 */}
-<div style={styles.toastBottom}>
-  <span style={styles.toastFooter}>KRX 매수주문이 완료되었습니다.</span>
-</div>
-  </>
-)}
+        <>
+          {/* 위쪽: 매수 체결 */}
+          <div style={styles.toastTop}>
+            <span style={styles.toastTitle}>매수 체결 [KRX]</span>
+            <div style={styles.toastInfoRow}>
+              <span style={styles.toastSymbol}>{SYMBOL}</span>
+              <span style={styles.toastPrice}>{(price*quantity).toLocaleString()}원</span>
+              <span style={styles.toastQty}>{quantity.toLocaleString()}주</span>
+            </div>
+          </div>
+          {/* 아래쪽: 주문 완료 */}
+          <div style={styles.toastBottom}>
+            <span style={styles.toastFooter}>KRX 매수주문이 완료되었습니다.</span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-/* =================== 스타일 =================== */
+/* =================== 스타일 (기존 유지) =================== */
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
@@ -331,18 +376,16 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   // 1열
   priceCell: {
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
-  height: '100%',
-  padding: '0 10px',
-  boxSizing: 'border-box',
-  transition: 'filter 120ms ease',
-},
-priceCellHighlight: {
-  boxShadow: 'inset 0 0 0 2px #c2185b',
-},
-priceCellHover: { filter: 'brightness(0.96)' },                         
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    padding: '0 10px',
+    boxSizing: 'border-box',
+    transition: 'filter 120ms ease',
+  },
+  priceCellHighlight: { boxShadow: 'inset 0 0 0 2px #c2185b' },
+  priceCellHover: { filter: 'brightness(0.96)' },
   bgSky:  { background: '#eef6ff' },
   bgPink: { background: '#ffdff4ff' },
   colPrice: { fontSize: 15 },
@@ -360,18 +403,9 @@ priceCellHover: { filter: 'brightness(0.96)' },
     overflow: 'hidden',
   },
   qtyNumber: { position: 'relative', zIndex: 2, fontSize: 14, color: '#333' },
-  qtyBarLeft: {
-    position: 'absolute',
-    left: 0, top: 0, bottom: 0,
-    background: 'rgba(33,150,243,0.18)',
-    zIndex: 1,
-  },
-  qtyBarAbove: {
-  background: 'rgba(33,150,243,0.25)',  // 🔹 기존 파란색 유지 (현재가 포함 위쪽)
-},
-qtyBarBelow: {
-  background: 'rgba(255,182,193,0.35)', // 🔹 연한 분홍 (현재가 아래쪽)
-},
+  qtyBarLeft: { position: 'absolute', left: 0, top: 0, bottom: 0, background: 'rgba(33,150,243,0.18)', zIndex: 1 },
+  qtyBarAbove: { background: 'rgba(33,150,243,0.25)' },
+  qtyBarBelow: { background: 'rgba(255,182,193,0.35)' },
 
   /* ===== Right ===== */
   orderEntrySection: {
@@ -382,7 +416,7 @@ qtyBarBelow: {
     gap: 8,
     alignContent: 'start',
     overflow: 'hidden',
-    padding: '12px 12px 104px 12px', // 하단 패딩으로 footer와 붙어 보이게
+    padding: '12px 12px 104px 12px',
   },
 
   row3col: { gridColumn: '1 / span 3', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, alignItems: 'center' },
@@ -444,68 +478,42 @@ qtyBarBelow: {
   modalOk: { height: 48, border: 'none', background: '#e36a93', color: '#fff', fontSize: 16, cursor: 'pointer' },
 
   toastTop: {
-  position: 'fixed',
-  top: 10,
-  left: '50%',
-  transform: 'translateX(-50%)',
-  width: 300,                  // 고정폭
-  background: '#c2185b',       // 진한 분홍
-  color: '#fff',
-  borderRadius: 10,
-  boxShadow: '0 6px 16px rgba(0,0,0,0.25)',
-  padding: '10px 12px',
-  textAlign: 'left',           // 🔹 왼쪽 정렬
-  fontSize: 15,
-  fontWeight: 700,
-  zIndex: 4000,
-},
-toastTitle: {
-  display: 'block',
-  fontSize: 15,
-  fontWeight: 800,
-  marginBottom: 6,             // 🔹 한 줄 띄움
-},
-toastInfoRow: {
-  display: 'grid',
-  gridTemplateColumns: '1fr auto auto', // 종목 | 가격 | 수량
-  alignItems: 'center',
-  columnGap: 16,               // 🔹 tab 느낌 간격
-},
-toastSymbol: {
-  justifySelf: 'start',
-  fontSize: 14,
-  fontWeight: 600,
-},
-toastPrice: {
-  justifySelf: 'center',
-  fontSize: 14,
-  fontWeight: 600,
-},
-toastQty: {
-  justifySelf: 'end',
-  fontSize: 14,
-  fontWeight: 700,
-},
-
-// ✅ 하단 팝업
-toastBottom: {
-  position: 'fixed',
-  bottom: 60,
-  left: '50%',
-  transform: 'translateX(-50%)',
-  background: 'rgba(50,50,50,0.5)', // 진한 회색 + 투명도
-  color: '#fff',
-  border: 'none',
-  borderRadius: 12,
-  padding: '8px 14px',      // ✅ 내부 여백만 남기기
-  textAlign: 'center',
-  fontSize: 13,
-  fontWeight: 600,
-  zIndex: 4000,
-
-  // 🔽 추가: 텍스트 길이에 맞게 박스 크기 자동 조정
-  display: 'inline-block',
-  width: 'auto',            // ✅ 고정폭 제거
-  whiteSpace: 'nowrap',     // ✅ 줄바꿈 방지
-},
+    position: 'fixed',
+    top: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 300,
+    background: '#c2185b',
+    color: '#fff',
+    borderRadius: 10,
+    boxShadow: '0 6px 16px rgba(0,0,0,0.25)',
+    padding: '10px 12px',
+    textAlign: 'left',
+    fontSize: 15,
+    fontWeight: 700,
+    zIndex: 4000,
+  },
+  toastTitle: { display: 'block', fontSize: 15, fontWeight: 800, marginBottom: 6 },
+  toastInfoRow: { display: 'grid', gridTemplateColumns: '1fr auto auto', alignItems: 'center', columnGap: 16 },
+  toastSymbol: { justifySelf: 'start', fontSize: 14, fontWeight: 600 },
+  toastPrice: { justifySelf: 'center', fontSize: 14, fontWeight: 600 },
+  toastQty: { justifySelf: 'end', fontSize: 14, fontWeight: 700 },
+  toastBottom: {
+    position: 'fixed',
+    bottom: 60,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: 'rgba(50,50,50,0.5)',
+    color: '#fff',
+    borderRadius: 12,
+    padding: '8px 14px',
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: 600,
+    zIndex: 4000,
+    display: 'inline-block',
+    width: 'auto',
+    whiteSpace: 'nowrap',
+  },
+  toastFooter: { fontSize: 13, fontWeight: 600, color: '#fff' },
 };

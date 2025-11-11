@@ -1,4 +1,14 @@
+// src/components/Quote/QuoteTable.tsx
 import React from 'react';
+import {
+  currentPrice,
+  totalAskQty,
+  totalBidQty,
+  priceMetrics,
+  mergedExecutions,
+  FIXED_PRICES,
+  toOrderBookRows,
+} from '../../Data/QuoteData';
 
 interface OrderBookRow {
   askQty: number; // 위쪽(매도) 수량
@@ -6,75 +16,10 @@ interface OrderBookRow {
   bidQty: number; // 아래쪽(매수) 수량
 }
 
-/** 고정 구간: 285,500 ~ 277,500 (500원 간격, 내림차순) */
-const FIXED_PRICES: number[] = [
-  285500, 285000, 284500, 284000, 283500, 283000, 282500,
-  282000,
-  281500, 281000, 280500, 280000, 279500, 279000, 278500, 278000, 277500,
-];
-
-/** 기본 더미(요청 주신 기존 값 유지) */
-const baseRows: OrderBookRow[] = [
-  { askQty: 236, price: 285500, bidQty: 0 },
-  { askQty: 189, price: 285000, bidQty: 0 },
-  { askQty: 111, price: 284500, bidQty: 0 },
-  { askQty: 13,  price: 284000, bidQty: 0 },
-  { askQty: 46,  price: 283500, bidQty: 0 },
-  { askQty: 130, price: 283000, bidQty: 0 },
-  { askQty: 391, price: 282500, bidQty: 0 },
-  { askQty: 55,  price: 282000, bidQty: 0 }, // 현재가
-  { askQty: 0,   price: 281500, bidQty: 65 },
-  { askQty: 0,   price: 281000, bidQty: 110 },
-  { askQty: 0,   price: 280500, bidQty: 194 },
-  { askQty: 0,   price: 280000, bidQty: 170 },
-  { askQty: 0,   price: 279500, bidQty: 139 },
-  { askQty: 0,   price: 279000, bidQty: 73 },
-  { askQty: 0,   price: 278500, bidQty: 60 },
-  { askQty: 0,   price: 278000, bidQty: 85 },
-  { askQty: 0,   price: 277500, bidQty: 100 },
-];
-
-/** 가격→행 매핑 후, 고정 구간만 추출 */
-function buildFixedOrderBook(): OrderBookRow[] {
-  const map = new Map<number, OrderBookRow>();
-  baseRows.forEach(r => map.set(r.price, r));
-  return FIXED_PRICES.map(p => map.get(p) ?? { askQty: 0, price: p, bidQty: 0 });
-}
-const orderBook = buildFixedOrderBook();
-
-/** 오른쪽 상단 메트릭(병합 영역에 표시) */
-const priceMetrics = [
-  { label: '예상등락', value: '-2.75%' },
-  { label: '예상가격', value: '282,500' },
-  { label: '예상수량', value: '233' },
-  { label: '전일거래', value: '218,766' },
-  { label: '거래량',  value: '215,623' },
-  { label: '전일비',  value: '98.56%' },
-  { label: '기준가',  value: '290,500' },
-  { label: '시가',    value: '280,000' },
-  { label: '고가',    value: '288,500' },
-  { label: '저가',    value: '271,500' },
-  { label: '상한가',  value: '377,500' },
-  { label: '하한가',  value: '203,500' },
-  { label: '거래비용', value: '509' },
-];
-
-/** 왼쪽 하단 병합 영역에 들어갈 임의 체결 데이터 */
-const mergedExecutions = [
-  { price: '282,000', qty: 3 },
-  { price: '281,500', qty: 5 },
-  { price: '281,500', qty: 7 },
-  { price: '281,500', qty: 9 },
-  { price: '282,000', qty: 4 },
-  { price: '282,000', qty: 6 },
-  { price: '281,500', qty: 7 },
-  { price: '281,500', qty: 9 },
-  { price: '282,000', qty: 4 },
-  { price: '282,000', qty: 6 },
-];
+// === 데이터: QuoteData에서 가격/수량만 주입 ===
+const orderBook: OrderBookRow[] = toOrderBookRows();
 
 export const QuoteTable: React.FC = () => {
-  const currentPrice = 282000;
   const currentIndex = orderBook.findIndex(r => r.price === currentPrice);
 
   const handlePriceClick = (price: number) => {
@@ -83,15 +28,15 @@ export const QuoteTable: React.FC = () => {
 
   // 병합 영역(픽셀) 계산
   const ROW_H = UI.ROW_H;
-  const rightMergedHeight = currentIndex * ROW_H;                         // 오른쪽 상단(현재가 위) 높이
-  const leftMergedTop = (currentIndex + 1) * ROW_H;                       // 왼쪽 하단 시작 위치
-  const leftMergedHeight = (orderBook.length - currentIndex - 1) * ROW_H; // 왼쪽 하단 전체 높이
+  const rightMergedHeight = Math.max(0, currentIndex) * ROW_H;                         // 오른쪽 상단(현재가 위)
+  const leftMergedTop = (currentIndex + 1) * ROW_H;                                    // 왼쪽 하단 시작
+  const leftMergedHeight = Math.max(0, orderBook.length - currentIndex - 1) * ROW_H;   // 왼쪽 하단 전체
 
   return (
     <div style={UI.container}>
       {/* ===== 3열 1:1:1 ===== */}
       <div style={UI.grid}>
-        {/* ===== 왼쪽 열 ===== */}
+        {/* ===== 왼쪽 열: 매도잔량 ===== */}
         <div style={UI.colLeft}>
           {orderBook.map((row, i) => {
             const isAbove = i < currentIndex;
@@ -100,13 +45,12 @@ export const QuoteTable: React.FC = () => {
                 key={`L-${row.price}`}
                 style={{
                   ...UI.cell,
-                  // ★ 마지막 행의 보더 제거 → 아래 총잔량 바와 1px 틈 제거
                   borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
                   ...(isAbove ? UI.bgBlueLight : {}),
                 }}
               >
                 {isAbove && row.askQty > 0 ? (
-                  <span style={UI.textDefault}>{row.askQty}</span>
+                  <span style={UI.textDefault}>{row.askQty.toLocaleString()}</span>
                 ) : (
                   <span style={UI.textMuted}> </span>
                 )}
@@ -114,7 +58,7 @@ export const QuoteTable: React.FC = () => {
             );
           })}
 
-          {/* [병합] 왼쪽 대각선 아래 */}
+          {/* [병합] 왼쪽 대각선 아래 — 체결리스트 */}
           <div
             style={{
               ...UI.leftMerged,
@@ -137,7 +81,7 @@ export const QuoteTable: React.FC = () => {
           </div>
         </div>
 
-        {/* ===== 가운데 열 ===== */}
+        {/* ===== 가운데 열: 가격 ===== */}
         <div style={UI.colCenter}>
           {orderBook.map((row, i) => {
             const isAbove = i < currentIndex;
@@ -148,7 +92,7 @@ export const QuoteTable: React.FC = () => {
                 key={`C-${row.price}`}
                 style={{
                   ...UI.cell,
-                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom, // ★
+                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
                   ...(isAbove ? UI.bgBlueLighter : {}),
                   ...(isBelow ? UI.bgPinkLighter : {}),
                 }}
@@ -175,7 +119,7 @@ export const QuoteTable: React.FC = () => {
           })}
         </div>
 
-        {/* ===== 오른쪽 열 ===== */}
+        {/* ===== 오른쪽 열: 매수잔량 ===== */}
         <div style={UI.colRight}>
           {orderBook.map((row, i) => {
             const isBelow = i > currentIndex;
@@ -184,12 +128,12 @@ export const QuoteTable: React.FC = () => {
                 key={`R-${row.price}`}
                 style={{
                   ...UI.cell,
-                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom, // ★
+                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
                   ...(isBelow ? UI.bgPinkLight : {}),
                 }}
               >
                 {isBelow && row.bidQty > 0 ? (
-                  <span style={UI.textDefault}>{row.bidQty}</span>
+                  <span style={UI.textDefault}>{row.bidQty.toLocaleString()}</span>
                 ) : (
                   <span style={UI.textMuted}> </span>
                 )}
@@ -197,7 +141,7 @@ export const QuoteTable: React.FC = () => {
             );
           })}
 
-          {/* [병합] 오른쪽 대각선 위 */}
+          {/* [병합] 오른쪽 대각선 위 — 가격 메트릭 */}
           <div
             style={{
               ...UI.rightMerged,
@@ -216,9 +160,9 @@ export const QuoteTable: React.FC = () => {
         </div>
       </div>
 
-      {/* ===== 총잔량 (테이블 내부, 고정 해제) ===== */}
+      {/* ===== 총잔량 ===== */}
       <div style={UI.bottomSticky}>
-        <div style={UI.summaryItem}><span style={UI.summaryValue}>1,356</span></div>
+        <div style={UI.summaryItem}><span style={UI.summaryValue}>{totalAskQty.toLocaleString()}</span></div>
         <div style={UI.summaryItem}>
           <span style={UI.summaryLabel}>총잔량</span>
           <button style={UI.summaryDropdown} aria-label="총잔량 옵션">
@@ -227,13 +171,13 @@ export const QuoteTable: React.FC = () => {
             </svg>
           </button>
         </div>
-        <div style={UI.summaryItem}><span style={UI.summaryValue}>1,453</span></div>
+        <div style={UI.summaryItem}><span style={UI.summaryValue}>{totalBidQty.toLocaleString()}</span></div>
       </div>
     </div>
   );
 };
 
-/* =================== 스타일 =================== */
+/* =================== 스타일 (기존 유지) =================== */
 const UI = {
   ROW_H: 48,
   container: {
@@ -249,7 +193,7 @@ const UI = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr',
     flex: 1,
-    overflow: 'visible',    // ← 내부 스크롤 해제
+    overflow: 'visible',
     borderTop: '1px solid #e0e0e0',
   } as React.CSSProperties,
 
@@ -323,7 +267,6 @@ const UI = {
   metricLabel: { color: '#666' } as React.CSSProperties,
   metricValue: { color: '#000' } as React.CSSProperties,
 
-  // 총잔량(테이블 내, 고정 해제 + 인덱스바와 접합)
   bottomSticky: {
     backgroundColor: '#fff',
     display: 'flex',
@@ -333,7 +276,7 @@ const UI = {
     padding: '10px 16px',
     borderTop: '1px solid #e0e0e0',
     margin: 0,
-    marginBottom: -2,      // 인덱스바 상단 보더와 정확히 접합
+    marginBottom: -2,
   } as React.CSSProperties,
 
   summaryItem:  { display: 'flex', alignItems: 'center', gap: 8 } as React.CSSProperties,
