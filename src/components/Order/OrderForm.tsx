@@ -387,7 +387,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   priceCellHighlight: { boxShadow: 'inset 0 0 0 2px #c2185b' },
   priceCellHover: { filter: 'brightness(0.96)' },
   bgSky:  { background: '#eef6ff' },
-  bgPink: { background: '#ffdff4ff' },
+  bgPink: { background: 'rgba(255,82,82,0.06)' },
   colPrice: { fontSize: 15 },
   txtUp:   { color: '#c2185b' },
   txtDown: { color: '#2196F3' },

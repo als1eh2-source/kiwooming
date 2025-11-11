@@ -80,3 +80,13 @@ export const ChartData = {
 "return_code": 0,
 "return_msg": "정상적으로 처리되었습니다"
 };
+// ✅ QuoteDisplay에서 사용할 종목 정보 제공 함수 (기존 코드 위에는 아무 영향 없음)
+export const getQuoteDisplayData = () => {
+  // 현재 선택된 종목코드 (기존 코드의 구조를 참고해 적절히 수정 가능)
+  const code = '039490';
+  const name = '키움증권';
+  const nxtAvailable = true; // false면 "NXT거래가능" 문구 안 붙음
+
+  return { code, name, nxtAvailable };
+};
+

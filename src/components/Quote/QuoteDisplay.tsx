@@ -1,6 +1,13 @@
+// src/components/Quote/QuoteDisplay.tsx
 import React from 'react';
+// [추가] 종목코드/종목명/NXT 가능 여부만 가져와서 바인딩
+import { getQuoteDisplayData } from '../../Data/ChartData';
 
 export const QuoteDisplay: React.FC = () => {
+  // [추가] 데이터만 교체 (UI/툴/스타일 변경 없음)
+  const { code, name, nxtAvailable } = getQuoteDisplayData();
+  const codeText = nxtAvailable ? `${code} NXT거래가능` : code;
+
   return (
     <div style={styles.container}>
       {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
@@ -11,15 +18,21 @@ export const QuoteDisplay: React.FC = () => {
             <div style={styles.selectorLeft}>
               <div style={styles.favoriteIcon}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z" stroke="#666" strokeWidth="2" fill="none"/>
+                  <path
+                    d="M12 2L15 8.5L22 9.3L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.3L9 8.5L12 2Z"
+                    stroke="#666"
+                    strokeWidth="2"
+                    fill="none"
+                  />
                 </svg>
               </div>
 
+              {/* [변경] 데이터 바인딩: name / codeText, 배지는 항상 '상장' */}
               <div style={styles.stockInfo}>
-                <span style={styles.stockName}>키움증권</span>
+                <span style={styles.stockName}>{name}</span>
                 <div style={styles.stockDetails}>
                   <span style={styles.badgeGreen}>상장</span>
-                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                  <span style={styles.stockCode}>{codeText}</span>
                 </div>
               </div>
             </div>
@@ -27,7 +40,13 @@ export const QuoteDisplay: React.FC = () => {
             {/* 드롭다운 버튼 */}
             <button style={styles.dropdownButton} aria-label="종목 선택">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M6 9L12 15L18 9"
+                  stroke="#666"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -35,8 +54,8 @@ export const QuoteDisplay: React.FC = () => {
           {/* 네모형 검색 버튼: 검색박스와 높이 동일, 양쪽이 맞닿도록 */}
           <button style={styles.searchButtonSquare} aria-label="검색">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
-              <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2" />
+              <path d="M21 21L16.5 16.5" stroke="#666" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
         </div>
@@ -87,7 +106,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   selectorGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: 0,               // ← 간격 없이
+    gap: 0, // ← 간격 없이
     flex: 1,
     minWidth: 0,
   },
@@ -101,8 +120,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'space-between',
     border: '1px solid #e0e0e0',
-    borderRight: 'none',                       // ← 버튼과 이중 보더 제거
-    borderRadius: '8px 0 0 8px',               // ← 왼쪽만 라운드
+    borderRight: 'none', // ← 버튼과 이중 보더 제거
+    borderRadius: '8px 0 0 8px', // ← 왼쪽만 라운드
     backgroundColor: '#fff',
     padding: '0 10px',
     boxSizing: 'border-box',
@@ -141,10 +160,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   // 검색 버튼(오른쪽) — 왼쪽 모서리 0, 검색박스와 연결되도록
   searchButtonSquare: {
     width: 40,
-    height: 50,                                  // ← 검색박스와 동일 높이
-    borderRadius: '0 8px 8px 0',                 // ← 오른쪽만 라운드
+    height: 50, // ← 검색박스와 동일 높이
+    borderRadius: '0 8px 8px 0', // ← 오른쪽만 라운드
     border: '1px solid #e0e0e0',
-    borderLeft: 'none',                           // ← 이중 보더 제거
+    borderLeft: 'none', // ← 이중 보더 제거
     backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
@@ -161,7 +180,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 
   // 폭을 282,000 텍스트에 '딱 맞게' 고정하기 위한 컨테이너
   priceBox: {
-    display: 'inline-block',  // ← 컨텐츠 너비만큼만 차지
+    display: 'inline-block', // ← 컨텐츠 너비만큼만 차지
   },
 
   priceRow: {
@@ -215,7 +234,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   badgeTop: {
     padding: '2px 2px',
     border: '1px solid #ccc',
-    borderBottom: 'none',            // ← 이중 보더 제거
+    borderBottom: 'none', // ← 이중 보더 제거
     borderRadius: '4px 4px 0 0',
     backgroundColor: '#fff',
     fontSize: 12,

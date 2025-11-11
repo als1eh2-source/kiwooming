@@ -1,8 +1,13 @@
 // src/components/Order/OrderDisplay.tsx
 // [변경] OrderDisplay 섹션이 줄어들지 않도록 flexShrink:0 추가 (크기 유지)
 import React from 'react';
+import { getQuoteDisplayData } from '../../Data/ChartData'; // ✅ 데이터만 교체
 
 export const OrderDisplay: React.FC = () => {
+  // ✅ 데이터 바인딩 (UI/툴/스타일 변경 없음)
+  const { code, name, nxtAvailable } = getQuoteDisplayData();
+  const codeText = nxtAvailable ? `${code} NXT거래가능` : code;
+
   const [pin, setPin] = React.useState('');
   const [showPad, setShowPad] = React.useState(false);
 
@@ -26,10 +31,11 @@ export const OrderDisplay: React.FC = () => {
                 </svg>
               </div>
               <div style={styles.stockInfo}>
-                <span style={styles.stockName}>키움증권</span>
+                {/* ✅ 데이터만 교체: 종목명/코드(+NXT 가능 시 문구) */}
+                <span style={styles.stockName}>{name}</span>
                 <div style={styles.stockDetails}>
                   <span style={styles.badgeGreen}>상장</span>
-                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                  <span style={styles.stockCode}>{codeText}</span>
                 </div>
               </div>
             </div>

@@ -26,30 +26,54 @@ export const QuoteTable: React.FC = () => {
     console.log('price clicked:', price);
   };
 
+  // [추가] 막대 너비 계산용 최대값 (0 방지)
+  const maxAsk = Math.max(1, ...orderBook.map(r => r.askQty));
+  const maxBid = Math.max(1, ...orderBook.map(r => r.bidQty));
+
+  // [추가] 가격 Hover 처리
+  const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
+
   // 병합 영역(픽셀) 계산
   const ROW_H = UI.ROW_H;
-  const rightMergedHeight = Math.max(0, currentIndex) * ROW_H;                         // 오른쪽 상단(현재가 위)
-  const leftMergedTop = (currentIndex + 1) * ROW_H;                                    // 왼쪽 하단 시작
-  const leftMergedHeight = Math.max(0, orderBook.length - currentIndex - 1) * ROW_H;   // 왼쪽 하단 전체
+  // [변경] 오른쪽 대각선 위 — "기준호가까지" 포함되도록 +1 행
+  const rightMergedHeight = Math.max(0, currentIndex + 1) * ROW_H;
+  // 왼쪽 대각선 아래 — 기준호가 바로 다음 행부터 시작
+  const leftMergedTop = (currentIndex + 1) * ROW_H;
+  const leftMergedHeight = Math.max(0, orderBook.length - currentIndex - 1) * ROW_H;
 
   return (
     <div style={UI.container}>
       {/* ===== 3열 1:1:1 ===== */}
       <div style={UI.grid}>
-        {/* ===== 왼쪽 열: 매도잔량 ===== */}
+        {/* ===== 왼쪽 열: 매도잔량 (오른쪽 고정 막대) ===== */}
         <div style={UI.colLeft}>
           {orderBook.map((row, i) => {
-            const isAbove = i < currentIndex;
+            // [변경] 기준호가(현재가)도 "매도쪽"에 포함시키기 위해 <= 로 변경
+            const isAboveOrCurrent = i <= currentIndex;
+            const barWidthPct = isAboveOrCurrent ? Math.min(1, row.askQty / maxAsk) * 100 : 0;
+
             return (
               <div
                 key={`L-${row.price}`}
                 style={{
                   ...UI.cell,
+                  position: 'relative',
+                  justifyContent: 'flex-end',
                   borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
-                  ...(isAbove ? UI.bgBlueLight : {}),
+                  ...(isAboveOrCurrent ? UI.bgBlueLight : {}),
                 }}
               >
-                {isAbove && row.askQty > 0 ? (
+                {/* [추가] 오른쪽 붙는 막대 */}
+                {isAboveOrCurrent && row.askQty > 0 && (
+                  <div
+                    style={{
+                      ...UI.qtyBarRightAnchored,
+                      width: `${Math.max(6, barWidthPct)}%`, // 최소 6% 보정
+                    }}
+                  />
+                )}
+                {/* 수량 텍스트 */}
+                {isAboveOrCurrent && row.askQty > 0 ? (
                   <span style={UI.textDefault}>{row.askQty.toLocaleString()}</span>
                 ) : (
                   <span style={UI.textMuted}> </span>
@@ -81,57 +105,78 @@ export const QuoteTable: React.FC = () => {
           </div>
         </div>
 
-        {/* ===== 가운데 열: 가격 ===== */}
+        {/* ===== 가운데 열: 가격 (hover 시 어둡게) ===== */}
         <div style={UI.colCenter}>
-          {orderBook.map((row, i) => {
-            const isAbove = i < currentIndex;
-            const isBelow = i > currentIndex;
-            const isCurrent = i === currentIndex;
-            return (
-              <div
-                key={`C-${row.price}`}
-                style={{
-                  ...UI.cell,
-                  borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
-                  ...(isAbove ? UI.bgBlueLighter : {}),
-                  ...(isBelow ? UI.bgPinkLighter : {}),
-                }}
-              >
-                <button
-                  style={{
-                    ...UI.priceButton,
-                    ...(isCurrent ? UI.currentBorder : {}),
-                  }}
-                  onClick={() => handlePriceClick(row.price)}
-                  aria-label={`호가 ${row.price.toLocaleString()}`}
-                >
-                  <span
-                    style={{
-                      ...(isCurrent ? UI.textCurrent : isAbove ? UI.textBlue : UI.textDefault),
-                      fontSize: 18,
-                    }}
-                  >
-                    {row.price.toLocaleString()}
-                  </span>
-                </button>
-              </div>
-            );
-          })}
-        </div>
+  {orderBook.map((row, i) => {
+    const isAbove = i < currentIndex;
+    const isBelow = i > currentIndex;
+    const isCurrent = i === currentIndex;
 
-        {/* ===== 오른쪽 열: 매수잔량 ===== */}
+    return (
+      <div
+        key={`C-${row.price}`}
+        style={{
+          ...UI.cell,
+          borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
+          ...(isAbove ? UI.bgBlueLighter : {}),
+          ...(isBelow ? UI.bgPinkLighter : {}),
+          ...(hoverIdx === i ? UI.centerHoverShade : {}),
+          // [추가] 현재가 셀 전체 하이라이트 (표 셀 크기 그대로)
+          ...(isCurrent ? UI.currentCellHighlight : {}),
+        }}
+      >
+        <button
+          style={{
+            ...UI.priceButton,
+            // [삭제] 버튼에 테두리 주던 코드 제거
+            // ...(isCurrent ? UI.currentBorder : {}),
+          }}
+          onClick={() => handlePriceClick(row.price)}
+          aria-label={`호가 ${row.price.toLocaleString()}`}
+          onMouseEnter={() => setHoverIdx(i)}
+          onMouseLeave={() => setHoverIdx(null)}
+        >
+          <span
+            style={{
+              ...(isCurrent ? UI.textCurrent : isAbove ? UI.textBlue : UI.textDefault),
+              fontSize: 18,
+            }}
+          >
+            {row.price.toLocaleString()}
+          </span>
+        </button>
+      </div>
+    );
+  })}
+</div>
+
+        {/* ===== 오른쪽 열: 매수잔량 (왼쪽 고정 막대) ===== */}
         <div style={UI.colRight}>
           {orderBook.map((row, i) => {
             const isBelow = i > currentIndex;
+            const barWidthPct = isBelow ? Math.min(1, row.bidQty / maxBid) * 100 : 0;
+
             return (
               <div
                 key={`R-${row.price}`}
                 style={{
                   ...UI.cell,
+                  position: 'relative',
+                  justifyContent: 'flex-start',
                   borderBottom: i === orderBook.length - 1 ? 'none' : UI.cell.borderBottom,
                   ...(isBelow ? UI.bgPinkLight : {}),
                 }}
               >
+                {/* [추가] 왼쪽 붙는 막대 */}
+                {isBelow && row.bidQty > 0 && (
+                  <div
+                    style={{
+                      ...UI.qtyBarLeftAnchored,
+                      width: `${Math.max(6, barWidthPct)}%`, // 최소 6% 보정
+                    }}
+                  />
+                )}
+                {/* 수량 텍스트 */}
                 {isBelow && row.bidQty > 0 ? (
                   <span style={UI.textDefault}>{row.bidQty.toLocaleString()}</span>
                 ) : (
@@ -141,7 +186,7 @@ export const QuoteTable: React.FC = () => {
             );
           })}
 
-          {/* [병합] 오른쪽 대각선 위 — 가격 메트릭 */}
+          {/* [병합] 오른쪽 대각선 위 — 가격 메트릭 (기준호가까지 포함) */}
           <div
             style={{
               ...UI.rightMerged,
@@ -177,9 +222,10 @@ export const QuoteTable: React.FC = () => {
   );
 };
 
-/* =================== 스타일 (기존 유지) =================== */
+/* =================== 스타일 (기존 + 추가) =================== */
 const UI = {
   ROW_H: 48,
+
   container: {
     backgroundColor: '#fff',
     display: 'flex',
@@ -211,11 +257,18 @@ const UI = {
     boxSizing: 'border-box',
   } as React.CSSProperties,
 
-  currentBorder: { border: '2px solid #ff4444', borderRadius: 6 } as React.CSSProperties,
+  // [추가] 가운데 가격 hover 시 어둡게
+  centerHoverShade: { filter: 'brightness(0.6)' } as React.CSSProperties,
 
-  bgBlueLight:   { backgroundColor: 'rgba(33,150,243,0.10)' } as React.CSSProperties,
+  currentCellHighlight: {
+  boxShadow: 'inset 0 0 0 2px #ff4444',
+  borderRadius: 0, // 셀 모서리 라운드를 주고 싶으면 적절히 조정
+} as React.CSSProperties,
+
+  // OrderForm의 색 레퍼런스 맞춤 (위=파랑, 아래=핑크)
+  bgBlueLight:   { backgroundColor: 'rgba(255, 255, 255, 1)' } as React.CSSProperties,
   bgBlueLighter: { backgroundColor: 'rgba(33,150,243,0.06)' } as React.CSSProperties,
-  bgPinkLight:   { backgroundColor: 'rgba(255,82,82,0.10)' } as React.CSSProperties,
+  bgPinkLight:   { backgroundColor: 'rgba(255, 255, 255, 1)' } as React.CSSProperties,
   bgPinkLighter: { backgroundColor: 'rgba(255,82,82,0.06)' } as React.CSSProperties,
 
   textDefault: { fontSize: 14, color: '#000' } as React.CSSProperties,
@@ -234,6 +287,25 @@ const UI = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 0,
+  } as React.CSSProperties,
+
+  // [추가] 막대 그래프 스타일
+  qtyBarRightAnchored: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    background: 'rgba(33,150,243,0.25)', // 위(매도) 계열
+    zIndex: 1,
+  } as React.CSSProperties,
+
+  qtyBarLeftAnchored: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    background: 'rgba(255,182,193,0.35)', // 아래(매수) 계열
+    zIndex: 1,
   } as React.CSSProperties,
 
   leftMerged: {
