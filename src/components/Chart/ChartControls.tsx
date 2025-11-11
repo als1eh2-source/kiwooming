@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChartData } from '../../Data/ChartData';
 
 export const ChartControls: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('일');
@@ -55,29 +56,6 @@ export const ChartControls: React.FC = () => {
         </div>
       </div>
 
-      {/* Indicator Settings */}
-      <div style={styles.indicators}>
-        <div style={styles.indicatorRow}>
-          <span style={styles.indicatorLabel}>중가 단순</span>
-          <span style={styles.indicatorValue5}>5</span>
-          <span style={styles.indicatorValue10}>10</span>
-          <span style={styles.indicatorValue20}>20</span>
-          <span style={styles.indicatorValue60}>60</span>
-          <span style={styles.indicatorValue120}>120</span>
-          
-          <button style={styles.periodSelector}>24</button>
-        </div>
-        
-        <div style={styles.priceInfo}>
-          <button style={styles.zoomButton} onClick={() => {/* Zoom */}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
-              <path d="M21 21L16.5 16.5M8 11H14M11 8V14" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-          <span style={styles.highPrice}>최고 322,500(-12.71%, 10/30) →</span>
-        </div>
-      </div>
     </div>
   );
 };
@@ -91,15 +69,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '8px 12px',
-    gap: '12px',
+    padding: '4px 10px',
+    gap: '10px',
   },
   periodTabs: {
     display: 'flex',
-    gap: '8px',
+    gap: '2px',
   },
   periodTab: {
-    padding: '8px 16px',
+    width: '55px',
+    padding: '8px 12px',
     border: '1px solid #e0e0e0',
     borderRadius: '4px',
     backgroundColor: '#fff',
@@ -125,42 +104,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  indicators: {
-    padding: '8px 12px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  indicatorRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flexWrap: 'wrap',
-  },
-  indicatorLabel: {
-    fontSize: '13px',
-    color: '#666',
-  },
-  indicatorValue5: {
-    fontSize: '13px',
-    color: '#ff4444',
-  },
-  indicatorValue10: {
-    fontSize: '13px',
-    color: '#ff9800',
-  },
-  indicatorValue20: {
-    fontSize: '13px',
-    color: '#4caf50',
-  },
-  indicatorValue60: {
-    fontSize: '13px',
-    color: '#2196F3',
-  },
-  indicatorValue120: {
-    fontSize: '13px',
-    color: '#9c27b0',
-  },
   periodSelector: {
     marginLeft: 'auto',
     padding: '4px 12px',
@@ -169,23 +112,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#fff',
     fontSize: '13px',
     cursor: 'pointer',
-  },
-  priceInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  zoomButton: {
-    background: 'none',
-    border: 'none',
-    padding: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  highPrice: {
-    fontSize: '13px',
-    color: '#ff4444',
   },
 };

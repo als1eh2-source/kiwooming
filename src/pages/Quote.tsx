@@ -27,11 +27,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '430px',
     margin: '0 auto',
     position: 'relative',
-    paddingBottom: '60px',
+    paddingBottom: 0,
     display: 'flex',
     flexDirection: 'column',
   },
   main: {
-    flex: 1,
+    flex: '1 0 auto',
   },
 };

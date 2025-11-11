@@ -1,29 +1,35 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import kiwooming from "../img/kiwooming.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
-
-
 type Pos = { x: number; y: number };
 
-export const FloatingChatbot: React.FC = () => {
+interface FloatingChatbotProps {
+  onHide?: () => void;
+}
+
+export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
   const location = useLocation();
-  const currentPath = location.pathname.replace("/", "") || "home"; 
+  const currentPath = location.pathname.replace("/", "") || "home";
   const ICON_W = 100;
   const ICON_H = 100;
 
+  const [visible, setVisible] = useState(true);
   const [position, setPosition] = useState<Pos>({
-    x: window.innerWidth - ICON_W - 24,
-    y: window.innerHeight - ICON_H - 24,
+    x: window.innerWidth - ICON_W -430,
+    y: window.innerHeight - ICON_H - 45,
   });
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isLongPress, setIsLongPress] = useState(false);
+  const [inDeleteZone, setInDeleteZone] = useState(false);
+
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>([
     {
       sender: "bot",
-      text: "안녕하세요! 저는 키우밍이에요 🌱 함께 투자 실력을 키워볼까요? 궁금한 게 있으시면 편하게 물어보세요!",
+      text: "안녕하세요! 저는 키우밍이에요 🌱 함께 투자 실력을 키워볼까요?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -32,6 +38,12 @@ export const FloatingChatbot: React.FC = () => {
   const pointerIdRef = useRef<number | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const pressStartTime = useRef<number>(0);
+
+  const DELETE_ZONE = {
+    x: window.innerWidth / 2 - 40,
+    y: window.innerHeight - 120,
+    radius: 80,
+  };
 
   const clamp = (x: number, y: number): Pos => {
     const maxX = window.innerWidth - ICON_W;
@@ -57,26 +69,44 @@ export const FloatingChatbot: React.FC = () => {
 
   const handlePointerMove = (e: PointerEvent) => {
     if (isDragging && isLongPress) {
-      setPosition(
-        clamp(e.clientX - offsetRef.current.x, e.clientY - offsetRef.current.y)
+      const newPos = clamp(
+        e.clientX - offsetRef.current.x,
+        e.clientY - offsetRef.current.y
       );
+      setPosition(newPos);
+
+      const dx = newPos.x - DELETE_ZONE.x;
+      const dy = newPos.y - DELETE_ZONE.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      setInDeleteZone(dist < DELETE_ZONE.radius);
     }
   };
 
   const handlePointerUp = () => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
-    const pressDuration = Date.now() - pressStartTime.current;
 
-    if (pressDuration < 400 && !isLongPress) {
-      toggleChat();
-    }
+    const pressDuration = Date.now() - pressStartTime.current;
+    const wasDragging = isDragging;
 
     setIsLongPress(false);
     setIsDragging(false);
+
+    if (inDeleteZone) {
+      setVisible(false);
+      onHide?.();
+      setInDeleteZone(false);
+      return;
+    }
+
+    if (pressDuration < 400 && !wasDragging) {
+      toggleChat(); 
+    }
+
+    setInDeleteZone(false);
   };
 
   useEffect(() => {
-    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointermove", handlePointerMove, { passive: false });
     window.addEventListener("pointerup", handlePointerUp);
     window.addEventListener("pointercancel", handlePointerUp);
     return () => {
@@ -84,113 +114,124 @@ export const FloatingChatbot: React.FC = () => {
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [isDragging, isLongPress]);
+  }, [isDragging, isLongPress, inDeleteZone]);
 
-const handleSend = async () => {
-  if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    const userMsg = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
 
-  const userMsg = { sender: "user", text: input };
-  setMessages((prev) => [...prev, userMsg]);
-  setInput("");
+    try {
+      const res = await axios.post("https://kiwooming-backend.onrender.com/chat", {
+        text: input,
+        context: currentPath,
+      });
+      const reply = res.data.reply || "응답 없음";
+      setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "⚠️ 서버 연결 실패 — FastAPI가 켜져 있나요?" },
+      ]);
+    }
+  };
 
-  try {
-    const res = await axios.post("http://127.0.0.1:8000/chat", {
-      text: input,
-      context: currentPath,
-    });
+  if (!visible) return null;
 
-    const reply = res.data.reply || "응답 없음";
-    setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
-  } catch (err) {
-    console.error(err);
-    setMessages((prev) => [
-      ...prev,
-      { sender: "bot", text: "⚠️ 서버 연결 실패 — FastAPI가 켜져 있나요?" },
-    ]);
-  }
-};
-
-  return (
+  return createPortal(
     <>
-      {/* 플로팅 버튼 */}
       <div
-        className="floating-chatbot"
         style={{
           position: "fixed",
           left: `${position.x}px`,
           top: `${position.y}px`,
           zIndex: 9999,
+          pointerEvents: "auto",
+          touchAction: "none",
         }}
       >
         <img
           src={kiwooming}
-          alt="키우밍 챗봇"
+          alt="키우밍"
           style={{
             width: ICON_W,
             height: ICON_H,
             cursor: isLongPress ? "grabbing" : "pointer",
             userSelect: "none",
             transition: isDragging ? "none" : "transform 0.15s ease",
-            transform: isLongPress ? "scale(0.9)" : "scale(1)",
+            transform: isLongPress ? "scale(0.95)" : "scale(1)",
           }}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
         />
       </div>
 
-      {/* 전체화면 챗봇 */}
-{isOpen && (
-  <div className="chat-overlay">
-    <div className="chat-box">
+      {isDragging && (
+        <div
+          style={{
+            position: "fixed",
+            left: "50%",
+            bottom: "40px",
+            transform: "translateX(-50%)",
+            width: "70px",
+            height: "70px",
+            borderRadius: "50%",
+            backgroundColor: inDeleteZone ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.2)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9998,
+            transition: "background-color 0.2s ease",
+          }}
+        >
+          <span style={{ color: "white", fontSize: "38px", fontWeight: 700 }}>⌂</span>
+        </div>
+      )}
 
-      {/* 상단 프로필 영역 */}
-      <div className="chat-top">
-        <img
-          src={kiwooming}
-          alt="키우밍 프로필"
-          className="profile-img"
-          onClick={toggleChat}
-        />
-        <button className="close-btn" onClick={toggleChat}>✕</button>
-      </div>
+      {isOpen && (
+        <div className="chat-overlay">
+          <div className="chat-box">
+            <div className="chat-top">
+              <img
+                src={kiwooming}
+                alt="키우밍 프로필"
+                className="profile-img"
+                onClick={toggleChat}
+              />
+              <button className="close-btn" onClick={toggleChat}>
+                ✕
+              </button>
+            </div>
 
-      {/* 메시지 표시 */}
-      <div className="chat-body">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
-          >
-            <span>{msg.text}</span>
+            <div className="chat-body">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
+                >
+                  <span>{msg.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="chat-input">
+              <input
+                type="text"
+                value={input}
+                placeholder="키우밍에게 물어보세요..."
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              />
+              <button onClick={handleSend}>전송</button>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
-      {/* 입력창 */}
-      <div className="chat-input">
-        <input
-          type="text"
-          value={input}
-          placeholder="키우밍에게 물어보세요..."
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-        <button onClick={handleSend}>전송</button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-      {/* 스타일 */}
       <style>{`
-        .floating-chatbot {
-          transition: transform 0.2s ease;
-        }
-
         .chat-overlay {
           position: fixed;
           inset: 0;
@@ -200,7 +241,6 @@ const handleSend = async () => {
           align-items: center;
           z-index: 99999;
           animation: fadeIn 0.25s ease;
-        //   backdrop-filter: blur(3px);
         }
 
         @keyframes fadeIn {
@@ -227,7 +267,6 @@ const handleSend = async () => {
           to { transform: translateY(0); opacity: 1; }
         }
 
-        /* 상단 프로필 */
         .chat-top {
           position: absolute;
           top: 12px;
@@ -262,7 +301,6 @@ const handleSend = async () => {
           background: rgba(255,255,255,0.8);
         }
 
-        /* 메시지 */
         .chat-body {
           flex: 1;
           padding: 80px 16px 16px;
@@ -293,7 +331,6 @@ const handleSend = async () => {
           color: black;
         }
 
-        /* 입력창 */
         .chat-input {
           display: flex;
           border-top: 1px solid #ddd;
@@ -324,6 +361,7 @@ const handleSend = async () => {
           background: #3767DD;
         }
       `}</style>
-    </>
+    </>,
+    document.body
   );
 };
