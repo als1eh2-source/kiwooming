@@ -55,8 +55,8 @@ export const OrderDisplay: React.FC = () => {
             </div>
             <div style={styles.subLine}>
               <span style={styles.subArrow}>▼</span>
-              <span style={styles.subChange}>8,500</span>
-              <span style={styles.subPercent}>2.93%</span>
+              <span style={styles.subChange}>0</span>
+              <span style={styles.subPercent}>0.02%</span>
             </div>
           </div>
         </div>
