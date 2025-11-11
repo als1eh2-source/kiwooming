@@ -1,4 +1,24 @@
 import React from 'react';
+import { ChartData } from '../../Data/ChartData';
+
+interface StkData {
+  dt: string;       // 날짜
+  stk_cd: string;   // 종목코드
+  cur_prc: number;  // 종가
+  pred_pre: String; //전일 대비 가격 변동
+  trde_tern_rt: String; //변동률
+}
+
+const rawData = ChartData.stk_dt_pole_chart_qry;
+
+const stockInfo: StkData[] = rawData.map((item: any) => ({
+  dt: item.dt,
+  stk_cd: String(ChartData.stk_cd),
+  cur_prc: Number(item.cur_prc),
+  pred_pre: String(item.pred_pre), //전일 대비 가격 변동
+  trde_tern_rt: String(item.trde_tern_rt) //변동률
+}));
+
 
 export const ChartDisplay: React.FC = () => {
   return (
@@ -19,7 +39,7 @@ export const ChartDisplay: React.FC = () => {
                 <span style={styles.stockName}>키움증권</span>
                 <div style={styles.stockDetails}>
                   <span style={styles.badgeGreen}>상장</span>
-                  <span style={styles.stockCode}>039490 NXT거래가능</span>
+                  <span style={styles.stockCode}>{stockInfo[0]?.stk_cd} NXT거래가능</span>
                 </div>
               </div>
             </div>
@@ -46,14 +66,14 @@ export const ChartDisplay: React.FC = () => {
           {/* priceBox를 inline-block으로 두어, 내부 가장 넓은 줄(=282,000)에 맞춰 컨테이너가 축소됨 */}
           <div style={styles.priceBox}>
             <div style={styles.priceRow}>
-              <span style={styles.currentPrice}>282,000</span>
+              <span style={styles.currentPrice}>{stockInfo[0].cur_prc.toLocaleString()}</span>
             </div>
 
             {/* 아래 작은 글씨 줄: 상단 텍스트(282,000)와 정확히 같은 너비 */}
             <div style={styles.subLine}>
-              <span style={styles.subArrow}>▼</span>
-              <span style={styles.subChange}>8,500</span>
-              <span style={styles.subPercent}>2.93%</span>
+              <span style={styles.subArrow}>{Number(stockInfo[0].pred_pre)>=0? '▲':'▼'}</span>
+              <span style={styles.subChange}>{stockInfo[0].pred_pre}</span>
+              <span style={styles.subPercent}>{stockInfo[0].trde_tern_rt}</span>
             </div>
           </div>
         </div>
