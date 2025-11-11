@@ -42,6 +42,5 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    paddingBottom: '110px', // IndexBar(54) + BottomNav(56)
   },
 };
