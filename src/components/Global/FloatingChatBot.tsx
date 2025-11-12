@@ -36,6 +36,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
 
   const offsetRef = useRef<Pos>({ x: 0, y: 0 });
   const pointerIdRef = useRef<number | null>(null);
+  const chatBodyRef = useRef<HTMLDivElement>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const pressStartTime = useRef<number>(0);
 
@@ -44,6 +45,18 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     y: window.innerHeight - 120,
     radius: 80,
   };
+
+  const scrollToBottom = () => {
+    const body = chatBodyRef.current;
+    if (body) {
+      body.scrollTop = body.scrollHeight;
+    }
+  };
+  useEffect(() => {
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [isOpen, messages]);
 
   const clamp = (x: number, y: number): Pos => {
     const maxX = window.innerWidth - ICON_W;
@@ -123,7 +136,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     setInput("");
 
     try {
-      const res = await axios.post("https://kiwooming-backend.onrender.com/chat", {
+      const res = await axios.post("http://localhost:8001/chat", {
         text: input,
         context: currentPath,
       });
@@ -206,7 +219,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
               </button>
             </div>
 
-            <div className="chat-body">
+            <div className="chat-body" ref={chatBodyRef}>
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
