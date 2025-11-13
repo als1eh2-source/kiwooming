@@ -4,7 +4,8 @@ import uppart_kiwooming from "../img/uppart_kiwooming.png";
 import kiwooming from "../img/kiwooming.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import { useSection } from "../../context/SectionContext"; 
+import { useSection } from "../../context/SectionContext";
+
 
 type Pos = { x: number; y: number };
 
@@ -144,7 +145,8 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
 
     try {
       const scrollY = window.scrollY;
-      const res = await axios.post("http://localhost:8001/chat", {
+      const API = process.env.REACT_APP_BACKEND_URL;
+      const res = await axios.post(`${API}/chat`, {
         text: input,
         context: currentPath,
         section: section,
