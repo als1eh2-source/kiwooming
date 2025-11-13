@@ -16,6 +16,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
   const location = useLocation();
   const currentPath = location.pathname.replace("/", "") || "home";
   const {section} = useSection();
+  const [isTyping, setIsTyping] = useState(false);
 
   const ICON_W = 100;
   const ICON_H = 100;
@@ -139,6 +140,8 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
 
+    setIsTyping(true);
+
     try {
       const scrollY = window.scrollY;
       const res = await axios.post("http://localhost:8001/chat", {
@@ -157,6 +160,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
         { sender: "bot", text: "⚠️ 서버 연결 실패 — FastAPI가 켜져 있나요?" },
       ]);
     }
+    setIsTyping(false);
   };
 
   if (!visible) return null;
@@ -234,7 +238,6 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
                   key={idx} 
                   className={`chat-message-wrapper ${msg.sender}`}
                 >
-
                   <div className={`chat-bubble ${msg.sender}`}>
 
                     {msg.sender === "bot" && (
@@ -244,12 +247,26 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
                         className="bubble-profile-inside"
                       />
                     )}
-
                     <span className="bubble-text">{msg.text}</span>
                   </div>
                 </div>
               ))}
+              {isTyping && (
+  <div className="chat-message-wrapper bot">
+    <div className="chat-bubble bot typing">
+      <img
+        src={uppart_kiwooming}
+        alt="bot"
+        className="bubble-profile-inside"
+      />
+      <div className="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+)}
             </div>
+            
 
             <div className="chat-input">
               <input
@@ -419,6 +436,48 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
       .chat-input button:hover {
         background: #3767DD;
       }
+
+      .typing {
+  background-color: #E9EFFE;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 80%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  background-color: #6b83d3;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typingBlink 1.4s infinite ease-in-out both;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingBlink {
+  0% { opacity: .2; transform: translateY(0px); }
+  20% { opacity: 1; transform: translateY(-3px); }
+  100% { opacity: .2; transform: translateY(0px); }
+}
+
 
       `}</style>
     </>,
