@@ -4,6 +4,7 @@ import uppart_kiwooming from "../img/uppart_kiwooming.png";
 import kiwooming from "../img/kiwooming.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { useSection } from "../../context/SectionContext"; 
 
 type Pos = { x: number; y: number };
 
@@ -14,6 +15,8 @@ interface FloatingChatbotProps {
 export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
   const location = useLocation();
   const currentPath = location.pathname.replace("/", "") || "home";
+  const {section} = useSection();
+
   const ICON_W = 100;
   const ICON_H = 100;
 
@@ -137,10 +140,15 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     setInput("");
 
     try {
+      const scrollY = window.scrollY;
       const res = await axios.post("http://localhost:8001/chat", {
         text: input,
         context: currentPath,
-      });
+        section: section,
+        scrollY: scrollY,
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
       const reply = res.data.reply || "응답 없음";
       setMessages((prev) => [...prev, { sender: "bot", text: reply }]);
     } catch {

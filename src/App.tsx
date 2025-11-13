@@ -11,12 +11,16 @@ import Order from "./pages/Order";
 import Chart from "./pages/Chart";
 import Account from "./pages/Account";
 
+import { SectionProvider } from "./context/SectionContext";
+
 import { FloatingChatbot } from "./components/Global/FloatingChatBot";
 
 function App() {
   const [showKiwooming, setShowKiwooming] = useState(true);
 
   return (
+        <SectionProvider>
+
     <div
       style={{
         width: "100%",
@@ -62,6 +66,7 @@ function App() {
         </BrowserRouter>
       </div>
     </div>
+    </SectionProvider>
   );
 }
 
