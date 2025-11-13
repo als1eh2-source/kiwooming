@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import uppart_kiwooming from "../img/uppart_kiwooming.png";
 import kiwooming from "../img/kiwooming.png";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
@@ -208,12 +209,12 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
         <div className="chat-overlay">
           <div className="chat-box">
             <div className="chat-top">
-              <img
-                src={kiwooming}
-                alt="키우밍 프로필"
-                className="profile-img"
+              {/* <img
+                src={uppart_kiwooming}
+                alt="내부 키우밍 프로필"
+                className="inner-profile-img"
                 onClick={toggleChat}
-              />
+              /> */}
               <button className="close-btn" onClick={toggleChat}>
                 ✕
               </button>
@@ -221,11 +222,23 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
 
             <div className="chat-body" ref={chatBodyRef}>
               {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`chat-bubble ${msg.sender === "user" ? "user" : "bot"}`}
+                <div 
+                  key={idx} 
+                  className={`chat-message-wrapper ${msg.sender}`}
                 >
-                  <span>{msg.text}</span>
+
+                  <div className={`chat-bubble ${msg.sender}`}>
+
+                    {msg.sender === "bot" && (
+                      <img
+                        src={uppart_kiwooming}
+                        alt="bot"
+                        className="bubble-profile-inside"
+                      />
+                    )}
+
+                    <span className="bubble-text">{msg.text}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -245,134 +258,160 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
       )}
 
       <style>{`
-        .chat-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.45);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 99999;
-          animation: fadeIn 0.25s ease;
-        }
+      .chat-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        animation: fadeIn 0.25s ease;
+      }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.98); }
-          to { opacity: 1; transform: scale(1); }
-        }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+      }
 
-        .chat-box {
-          width: 92%;
-          max-width: 420px;
-          height: 80%;
-          background: white;
-          border-radius: 20px 20px 0 0;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-          animation: slideUp 0.3s ease;
-          position: relative;
-        }
+      .chat-box {
+        width: 100%;
+        max-width: 420px;
+        height: 80%;
+        background: white;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        animation: slideUp 0.3s ease;
+        position: relative;
+      }
 
-        @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
 
-        .chat-top {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          right: 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: transparent;
-        }
+      .chat-top {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        background: transparent;
+      }
+      .profile-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
 
-        .profile-img {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
+      .close-btn {
+        background: rgba(255,255,255,0.5);
+        border: none;
+        color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        transition: 0.2s;
+      }
 
-        .close-btn {
-          background: rgba(255,255,255,0.5);
-          border: none;
-          color: #333;
-          font-size: 24px;
-          cursor: pointer;
-          border-radius: 50%;
-          width: 36px;
-          height: 36px;
-          transition: 0.2s;
-        }
+      .close-btn:hover {
+        background: rgba(255,255,255,0.8);
+      }
 
-        .close-btn:hover {
-          background: rgba(255,255,255,0.8);
-        }
+      .chat-body {
+        flex: 1;
+        padding: 80px 16px 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #f9fafb;
+      }
 
-        .chat-body {
-          flex: 1;
-          padding: 80px 16px 16px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          background: #f9fafb;
-        }
+      .chat-message-wrapper {
+        width: 100%;
+        display: flex;
+        margin-bottom: 14px;
+      }
 
-        .chat-bubble {
-          padding: 10px 14px;
-          border-radius: 12px;
-          max-width: 80%;
-          line-height: 1.5;
-          font-size: 15px;
-        }
+      .chat-message-wrapper.bot {
+        justify-content: flex-start;
+      }
 
-        .chat-bubble.user {
-          align-self: flex-end;
-          background-color: #3767DD;
-          color: white;
-        }
+      .chat-message-wrapper.user {
+        justify-content: flex-end;
+      }
 
-        .chat-bubble.bot {
-          align-self: flex-start;
-          background-color: #E9EFFE;
-          color: black;
-        }
+      .chat-bubble {
+        position: relative;
+        max-width: 75%;
+        border-radius: 14px;
+        padding: 10px 10px 10px 10px; /* 프로필 자리 확보 */
+        line-height: 1.5;
+        font-size: 13px;
+        background: #E9EFFE; /* bot default */
+        color: #000;
+      }
 
-        .chat-input {
-          display: flex;
-          border-top: 1px solid #ddd;
-          padding: 10px;
-          background: white;
-        }
+      .chat-bubble.user {
+        background: #3767DD;
+        color: white;
+        padding: 12px;
+      }
 
-        .chat-input input {
-          flex: 1;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          padding: 10px;
-          font-size: 15px;
-        }
+      .bubble-profile-inside {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
 
-        .chat-input button {
-          background: #2563eb;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          padding: 10px 16px;
-          margin-left: 6px;
-          cursor: pointer;
-          font-weight: 600;
-        }
+        position: absolute;
+        top: -30px;    
+        left: -0px;   
+        z-index: 2;
+      }
 
-        .chat-input button:hover {
-          background: #3767DD;
-        }
+      .bubble-text {
+        font-size: 13px;
+      }
+
+      .chat-input {
+        display: flex;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+        background: white;
+      }
+
+      .chat-input input {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .chat-input button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-left: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .chat-input button:hover {
+        background: #3767DD;
+      }
+
       `}</style>
     </>,
     document.body
