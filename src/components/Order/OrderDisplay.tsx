@@ -1,10 +1,7 @@
-// src/components/Order/OrderDisplay.tsx
-// [변경] OrderDisplay 섹션이 줄어들지 않도록 flexShrink:0 추가 (크기 유지)
 import React from 'react';
-import { getQuoteDisplayData } from '../../Data/ChartData'; // ✅ 데이터만 교체
+import { getQuoteDisplayData } from '../../Data/ChartData'; 
 
 export const OrderDisplay: React.FC = () => {
-  // ✅ 데이터 바인딩 (UI/툴/스타일 변경 없음)
   const { code, name, nxtAvailable } = getQuoteDisplayData();
   const codeText = nxtAvailable ? `${code} NXT거래가능` : code;
 
@@ -20,7 +17,6 @@ export const OrderDisplay: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
       <div style={styles.selectorRow}>
         <div style={styles.selectorGroup}>
           <div style={styles.selectorBox}>
@@ -31,7 +27,6 @@ export const OrderDisplay: React.FC = () => {
                 </svg>
               </div>
               <div style={styles.stockInfo}>
-                {/* ✅ 데이터만 교체: 종목명/코드(+NXT 가능 시 문구) */}
                 <span style={styles.stockName}>{name}</span>
                 <div style={styles.stockDetails}>
                   <span style={styles.badgeGreen}>상장</span>
@@ -94,7 +89,6 @@ export const OrderDisplay: React.FC = () => {
         </div>
       </div>
 
-      {/* 숫자 키패드(선택) */}
       {showPad && (
         <>
           <div style={styles.keypadBackdrop} onClick={closePad} />
@@ -121,9 +115,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#fff',
     borderBottom: '1px solid #e0e0e0',
     padding: 4,
-    flexShrink: 0, // [추가] 위 영역 크기 유지
+    flexShrink: 0,
   },
-  /* 이하 동일 (원본 유지) */
   selectorRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   selectorGroup: { display: 'flex', alignItems: 'center', gap: 0, flex: 1, minWidth: 0 },
   selectorBox: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import { QuoteDisplay } from '../components/Quote/QuoteDisplay';
 import { QuoteTable } from '../components/Quote/QuoteTable';
@@ -7,8 +7,9 @@ import { Footer } from "../components/Global/Footer";
 
 
 export default function Quote() {
-  const { symbol } = useParams<{ symbol?: string }>();
-
+  useEffect(() => {
+  window.scrollTo(0, 0);
+  }, []);
   return (
     <div style={styles.container}>
       <Header

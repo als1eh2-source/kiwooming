@@ -1,18 +1,13 @@
-// src/components/Quote/QuoteDisplay.tsx
 import React from 'react';
-// [추가] 종목코드/종목명/NXT 가능 여부만 가져와서 바인딩
 import { getQuoteDisplayData } from '../../Data/ChartData';
 
 export const QuoteDisplay: React.FC = () => {
-  // [추가] 데이터만 교체 (UI/툴/스타일 변경 없음)
   const { code, name, nxtAvailable } = getQuoteDisplayData();
   const codeText = nxtAvailable ? `${code} NXT거래가능` : code;
 
   return (
     <div style={styles.container}>
-      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
       <div style={styles.selectorRow}>
-        {/* 왼쪽: 검색 영역 (박스 + 네모형 검색 버튼을 붙여서) */}
         <div style={styles.selectorGroup}>
           <div style={styles.selectorBox}>
             <div style={styles.selectorLeft}>
@@ -27,7 +22,6 @@ export const QuoteDisplay: React.FC = () => {
                 </svg>
               </div>
 
-              {/* [변경] 데이터 바인딩: name / codeText, 배지는 항상 '상장' */}
               <div style={styles.stockInfo}>
                 <span style={styles.stockName}>{name}</span>
                 <div style={styles.stockDetails}>
@@ -37,7 +31,6 @@ export const QuoteDisplay: React.FC = () => {
               </div>
             </div>
 
-            {/* 드롭다운 버튼 */}
             <button style={styles.dropdownButton} aria-label="종목 선택">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path

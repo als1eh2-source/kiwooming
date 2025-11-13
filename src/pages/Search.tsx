@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
+import kiwoom from "../components/img/kiwoom.png";
 
-/**
- * Search Page Component
- * 
- * 검색 페이지
- * - 주식/메뉴 검색 기능
- * - 실시간 인기 검색어 표시
- * - 모바일 최적화 (360-430px)
- */
 
 interface StockResult {
 id: number;
@@ -26,7 +19,6 @@ export const Search: React.FC = () => {
 const navigate = useNavigate();
 const [searchQuery, setSearchQuery] = useState('');
 
-// Trending search tags
 const trendingTags = [
 '#삼성전자',
 '#SK하이닉스',
@@ -35,11 +27,10 @@ const trendingTags = [
 '#카카오',
 ];
 
-// Mock search result data
 const stockResults: StockResult[] = [
-{ id: 1, name: '키움제10호스팩', icon: '📊' },
-{ id: 2, name: '키움제11호스팩', icon: '📊' },
-{ id: 3, name: '키움증권', icon: '📊' },
+{ id: 1, name: '키움제10호스팩', icon: kiwoom},
+{ id: 2, name: '키움제11호스팩', icon: kiwoom },
+{ id: 3, name: '키움증권', icon: kiwoom},
 ];
 
 const menuResults: MenuResult[] = [
@@ -64,8 +55,8 @@ const handleBack = () => {
 navigate(-1);
 };
 
-const handleMicClick = () => {
-console.log('Voice search activated');
+const handleVoiceClick = () => {
+    console.log('Voice search clicked');
 };
 
 const handleTagClick = (tagName: string) => {
@@ -98,6 +89,10 @@ if (searchQuery.trim()) {
 }
 };
 
+useEffect(() => {
+window.scrollTo(0, 0);
+}, []);
+
 return (
 <div style={styles.pageContainer}>
     {/* Top Search Bar */}
@@ -124,12 +119,24 @@ return (
 
         {/* Microphone Icon */}
         <button
-        type="button"
-        onClick={handleMicClick}
-        style={styles.micButton}
-        aria-label="Voice search"
+        onClick={handleVoiceClick}
+        style={styles.iconButton}
+        aria-label="음성 검색"
         >
-        <span style={styles.micIcon}>🎤</span>
+        <svg
+            style={styles.micIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#666666"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect x="8" y="1" width="8" height="12" rx="3" />
+            <line x1="12" y1="14" x2="12" y2="19" />
+            <path d="M5 11a7 6 0 0 0 14 0" />
+            <line x1="8" y1="19" x2="16" y2="19" />
+        </svg>
         </button>
     </form>
     </div>
@@ -179,7 +186,9 @@ return (
                 onClick={() => handleStockClick(stock.name)}
                 style={styles.stockResultItem}
                 >
-                <span style={styles.stockIcon}>{stock.icon}</span>
+                <span style={styles.stockIcon}>
+                <img src={stock.icon} alt={stock.name} style={{ width: 24, height: 24 }} />
+                </span>
                 <span style={styles.stockName}>{stock.name}</span>
                 </div>
             ))}
@@ -286,7 +295,9 @@ justifyContent: 'center',
 flexShrink: 0,
 },
 micIcon: {
-fontSize: '18px',
+width: "20px",
+height: "20px",
+display: "block",
 },
 
 // Content Container
@@ -375,6 +386,16 @@ stockName: {
 fontSize: '14px',
 color: '#000000',
 fontWeight: 400,
+},
+iconButton: {
+    background: 'none',
+    border: 'none',
+    padding: '0',
+    margin: '0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
 },
 
 // Menu Result Item

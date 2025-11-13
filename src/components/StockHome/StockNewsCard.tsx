@@ -42,7 +42,7 @@ console.log('Expand to full news list');
 
 const handleNewsClick = (newsTitle: string, id: number) => {
 if (id === 1) {
-    navigate('/news');
+    navigate('/newsdetail');
 } else {
     console.log('Go to news article:', newsTitle);
 }

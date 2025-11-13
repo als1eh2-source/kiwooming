@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { ChartData } from "../../Data/ChartData";
 
 interface CandleData {
-  dt: string;        // "20251030" 같은 yyyymmdd
+  dt: string;       
   open_pric: number;
   high_pric: number;
   low_pric: number;
@@ -103,7 +103,7 @@ export const ChartCanvas: React.FC = () => {
     if (scrollRef.current && scrollRef2.current) {
       scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
       scrollRef2.current.scrollLeft = scrollRef2.current.scrollWidth;
-      updateVisibleExtremes(); // 초기 표시
+      updateVisibleExtremes(); 
     }
   }, []);
 
@@ -152,7 +152,6 @@ export const ChartCanvas: React.FC = () => {
     updateVisibleExtremes();
   };
 
-  // 드래그 스크롤
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
@@ -186,7 +185,7 @@ export const ChartCanvas: React.FC = () => {
       onMouseUp={endDrag}
       onMouseLeave={endDrag}
     >
-      {/* 상단 범례 */}
+
       <div style={styles.legendWrapper}>
         <div style={styles.indicators}>
           <div style={styles.indicatorRow}>
@@ -200,10 +199,9 @@ export const ChartCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* 가격 차트 */}
       <div ref={scrollRef} onScroll={syncScroll} style={styles.scrollWrapper} className="scrollWrapper">
         <svg width={svgWidth} height={PRICE_HEIGHT} style={styles.svg}>
-          {/* 그리드 */}
+
           {Array.from({ length: 5 }).map((_, i) => {
             const y = priceTopPad + (i * priceInnerH) / 4;
             return (
@@ -211,7 +209,6 @@ export const ChartCanvas: React.FC = () => {
             );
           })}
 
-          {/* 이동평균선 */}
           {(
             [
               ["ma5", ma5],
@@ -230,7 +227,6 @@ export const ChartCanvas: React.FC = () => {
             />
           ))}
 
-          {/* 캔들 */}
           {Candles.map((c, i) => {
             const x = xAt(i);
             const isRise = c.cur_prc >= c.open_pric;
@@ -264,14 +260,12 @@ export const ChartCanvas: React.FC = () => {
             );
           })}
 
-          {/* 날짜 눈금 */}
           {dateTicks.map((c, idx) => (
             <text key={idx} x={40 + idx * xGap * 5} y={PRICE_HEIGHT - 5} fontSize="10" fill="#666" textAnchor="middle">
               {prettyMD(c.dt)}
             </text>
           ))}
 
-          {/* 현재 보이는 구간 최고/최저 */}
           {visibleHiIdx !== null && visibleHi !== null && (
             <>
               <line
@@ -308,7 +302,6 @@ export const ChartCanvas: React.FC = () => {
         </svg>
       </div>
 
-      {/* 오른쪽 고정 Y축 */}
       <div style={styles.fixedYAxis}>
         {Array.from({ length: 5 }).map((_, i) => {
           const y = priceTopPad + (i * priceInnerH) / 4;
@@ -321,7 +314,6 @@ export const ChartCanvas: React.FC = () => {
         })}
       </div>
 
-      {/* 상단 범례 */}
       <div style={styles.legendWrapper}>
         <div style={styles.indicators}>
           <div style={styles.indicatorRow}>
@@ -335,7 +327,6 @@ export const ChartCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* 거래량 */}
       <div ref={scrollRef2} onScroll={syncScroll} style={styles.scrollWrapper} className="scrollWrapper">
         <svg width={svgWidth} height={VOL_HEIGHT} style={styles.svg}>
           {Candles.map((c, i) => {
@@ -356,7 +347,6 @@ export const ChartCanvas: React.FC = () => {
             );
           })}
 
-          {/* 거래량 이동평균선 */}
           {[["#ff44aa", calcMA(Candles, "trde_qty" as any, 5)], ["#ff9800", calcMA(Candles, "trde_qty" as any, 20)]].map(
             ([color, arr], idx) => (
               <polyline
@@ -372,7 +362,6 @@ export const ChartCanvas: React.FC = () => {
         </svg>
       </div>
 
-      {/* 스크롤바 숨김 */}
       <style>{`.scrollWrapper::-webkit-scrollbar { display: none; }`}</style>
     </div>
   );

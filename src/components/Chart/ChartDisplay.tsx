@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { ChartData } from '../../Data/ChartData';
 
 interface StkData {
@@ -21,6 +21,9 @@ const stockInfo: StkData[] = rawData.map((item: any) => ({
 
 
 export const ChartDisplay: React.FC = () => {
+    useEffect(() => {
+    window.scrollTo(0, 0);
+    }, []);
   return (
     <div style={styles.container}>
       <div style={styles.selectorRow}>

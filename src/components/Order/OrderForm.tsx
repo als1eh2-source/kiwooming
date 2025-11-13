@@ -1,28 +1,28 @@
-// src/components/Order/OrderForm.tsx
-import React from 'react';
+import React, {useEffect} from 'react';
 import { currentPrice, toOrderBookRows } from '../../Data/QuoteData';
 
 interface ViewRow { price: number; quantity: number; }
 
 const SYMBOL = '키움증권';
-const ROW_H = 60; // 왼쪽 호가 리스트 한 행 고정 높이(약 9행 고정 뷰)
+const ROW_H = 60; 
 
-// === QuoteData 연동: 호가/잔량 로딩 ===
-const book = toOrderBookRows(); // [{ price, askQty, bidQty }]
-// 현재가 포함 위쪽(매도)은 askQty, 아래쪽(매수)은 bidQty 사용
+const book = toOrderBookRows(); 
 const currentIndex = book.findIndex(r => r.price === currentPrice);
-const start = Math.max(0, currentIndex - 7);               // 위로 7개
-const end   = Math.min(book.length, currentIndex + 1 + 8);  // (현재가 포함) + 아래로 8개
+const start = Math.max(0, currentIndex - 7);       
+const end   = Math.min(book.length, currentIndex + 1 + 8); 
 const visibleBook = book.slice(start, end);
 const orderBookRows: ViewRow[] = visibleBook.map(r => ({
   price: r.price,
   quantity: r.price >= currentPrice ? r.askQty : r.bidQty,
 }));
 
-// 막대 비율 산정도 화면에 보이는 구간 기준으로
 const maxQty = Math.max(1, ...visibleBook.map(r => Math.max(r.askQty, r.bidQty)));
 
 export const OrderForm: React.FC = () => {
+  useEffect(() => {
+  window.scrollTo(0, 0);
+  }, []);
+
   const [activeTab, setActiveTab] = React.useState<'매수'|'매도'|'정정/취소'|'미체결'|'잔고'>('매수');
   const [orderType, setOrderType] = React.useState<'현금'|'신용'>('현금');
   const [priceType] = React.useState('보통(지정가)');
@@ -37,7 +37,6 @@ export const OrderForm: React.FC = () => {
   const [showToast, setShowToast] = React.useState(false);
   const [hoverPrice, setHoverPrice] = React.useState<number | null>(null);
 
-  // ✅ [추가] 신용 클릭 시에만 노출되는 3열 드롭다운 상태
   const [creditOpen, setCreditOpen] = React.useState(false);
   const [creditType, setCreditType] = React.useState<'융자' | '대주상환'>('융자');
 
@@ -55,7 +54,6 @@ export const OrderForm: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      {/* 탭바 */}
       <div style={styles.tabBar}>
         {(['매수','매도','정정/취소','미체결','잔고'] as const).map((tab) => (
           <button
@@ -68,9 +66,7 @@ export const OrderForm: React.FC = () => {
         ))}
       </div>
 
-      {/* 메인 2열 */}
       <div style={styles.mainContent}>
-        {/* Left: 2:1, 왼쪽만 스크롤 — QuoteData 기반 호가/잔량 */}
         <div style={styles.orderBookSection}>
           <div style={styles.orderBookHeader}>
             <span style={styles.headerLabel}>호가</span>
@@ -83,7 +79,6 @@ export const OrderForm: React.FC = () => {
               const barWidth = Math.max(0.06, row.quantity / maxQty);
               return (
                 <div key={row.price} style={styles.orderRow} onClick={() => onPickBook(row.price)}>
-                  {/* 1열: 가격 (배경은 1열만), 현재가 outline, hover 어둡게 */}
                   <div
                     style={{
                       ...styles.priceCell,
@@ -99,7 +94,6 @@ export const OrderForm: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* 2열: 잔량 숫자 + 왼쪽 막대 (배경 없음) */}
                   <div style={styles.qtyCell}>
                     <div
                       style={{
@@ -116,9 +110,7 @@ export const OrderForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: 3열 그리드 (기존 레이아웃/툴 유지) */}
         <div style={styles.orderEntrySection}>
-          {/* 1행: (1~2열 병합) 현금|신용 + 3열 조건부 드롭다운 */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBox}>
               <button
@@ -131,7 +123,6 @@ export const OrderForm: React.FC = () => {
               >신용</button>
             </div>
 
-            {/* ✅ 신용일 때만 3열에 '융자/대주상환' 드롭다운 표시 */}
             {orderType === '신용' ? (
               <div style={{ position: 'relative' }}>
                 <button
@@ -163,11 +154,10 @@ export const OrderForm: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div />  /* 현금일 때는 기존과 동일하게 빈칸 */
+              <div /> 
             )}
           </div>
 
-          {/* 2행: (1~2열 병합) 텍스트 좌/토글 우 */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBoxBetween}>
               <span style={styles.leftText}>{priceType}</span>
@@ -180,7 +170,6 @@ export const OrderForm: React.FC = () => {
             <div />
           </div>
 
-          {/* 3행: (1~2열 병합) - | 인풋 | + (1:3:1) */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBoxRatio}>
               <button style={styles.smallMinus} onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
@@ -198,7 +187,6 @@ export const OrderForm: React.FC = () => {
             <div />
           </div>
 
-          {/* 4행: 체크+미수수량 | %드롭다운 | 가능 */}
           <div style={styles.row3col}>
             <label style={styles.checkCellBare}>
               <input type="checkbox" checked={useMargin} onChange={(e) => setUseMargin(e.target.checked)} />
@@ -230,7 +218,6 @@ export const OrderForm: React.FC = () => {
             <button style={styles.smallButton}>가능</button>
           </div>
 
-          {/* 5행: (1~2열 병합) - | 가격(클릭 반영) | +  / 3열: 시장가 */}
           <div style={styles.rowMerge}>
             <div style={styles.mergeBoxRatio}>
               <button style={styles.smallMinus} onClick={() => setPrice(price - 500)}>−</button>
@@ -242,7 +229,6 @@ export const OrderForm: React.FC = () => {
             <button style={styles.marketButton}>시장가</button>
           </div>
 
-          {/* 6행: (1~2열 병합) 체크+가격 자동(현재가) / 3열: 호가 */}
           <div style={styles.rowMerge}>
             <label style={{ ...styles.checkCellBare, ...styles.mergeFill }}>
               <input type="checkbox" checked={autoPrice} onChange={(e) => setAutoPrice(e.target.checked)} />
@@ -251,26 +237,20 @@ export const OrderForm: React.FC = () => {
             <button style={styles.smallButton}>호가</button>
           </div>
 
-          {/* 아래로 밀기 → 8/9행이 footer와 맞닿아 보이도록 */}
-          <div style={styles.bottomSpacer} />
-          <div style={styles.rowEmpty} />
           <div style={styles.rowEmpty} />
 
-          {/* 8행: SOR 주문금액(= 가격 × 수량) */}
           <div style={styles.rowBottom}>
             <div style={styles.sorLabel}>SOR 주문금액</div>
             <div />
             <div style={styles.sorValue}>{(price * quantity).toLocaleString()}원</div>
           </div>
 
-          {/* 9행: 현금매수 */}
           <div style={styles.row9}>
             <button type="button" style={styles.submitWide} onClick={handleSubmit}>현금매수</button>
           </div>
         </div>
       </div>
 
-      {/* 확인 모달 (showConfirm) */}
       {showConfirm && (
         <>
           <div style={styles.modalBackdrop} onClick={() => setShowConfirm(false)} />
@@ -297,10 +277,8 @@ export const OrderForm: React.FC = () => {
         </>
       )}
 
-      {/* 상단/하단 토스트 */}
       {showToast && (
         <>
-          {/* 위쪽: 매수 체결 */}
           <div style={styles.toastTop}>
             <span style={styles.toastTitle}>매수 체결 [KRX]</span>
             <div style={styles.toastInfoRow}>
@@ -309,7 +287,6 @@ export const OrderForm: React.FC = () => {
               <span style={styles.toastQty}>{quantity.toLocaleString()}주</span>
             </div>
           </div>
-          {/* 아래쪽: 주문 완료 */}
           <div style={styles.toastBottom}>
             <span style={styles.toastFooter}>KRX 매수주문이 완료되었습니다.</span>
           </div>
@@ -319,7 +296,6 @@ export const OrderForm: React.FC = () => {
   );
 };
 
-/* =================== 스타일 (기존 유지) =================== */
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     backgroundColor: '#fff',
@@ -330,18 +306,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     minHeight: 0,
   },
 
-  /* 탭바 */
   tabBar: { display: 'flex', borderBottom: '1px solid #e0e0e0', flexShrink: 0 },
   tab: { flex: 1, padding: '14px 8px', border: 'none', background: '#fff', fontSize: 14, color: '#666', cursor: 'pointer', borderBottom: '2px solid transparent' },
   tabActiveBuy: { color: '#c2185b', borderBottom: '2px solid #c2185b' },
   tabActiveSell: { color: '#2196F3', borderBottom: '2px solid #2196F3' },
 
-  /* 메인 2열 */
   mainContent: { display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' },
 
-  /* ===== Left ===== */
   orderBookSection: {
     width: 168, maxWidth: 190, minWidth: 160,
+    maxHeight:440,
     borderRight: '1px solid #e0e0e0',
     display: 'flex', flexDirection: 'column',
     overflow: 'hidden',
@@ -356,10 +330,10 @@ const styles: { [key: string]: React.CSSProperties } = {
   headerLabelRight: { fontSize: 13, color: '#666', textAlign: 'right' },
 
   orderBook: {
-    height: ROW_H * 9,              // 9행 고정 뷰
+    height: ROW_H * 9,             
     overflowY: 'auto',
     WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'none',
+    scrollbarWidth: 'thin',
     msOverflowStyle: 'none',
   },
 
@@ -416,7 +390,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: 8,
     alignContent: 'start',
     overflow: 'hidden',
-    padding: '12px 12px 104px 12px',
+    padding: '12px 12px 0px 12px',
   },
 
   row3col: { gridColumn: '1 / span 3', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, alignItems: 'center' },
@@ -425,7 +399,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   mergeBoxBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 40, border: '1px solid #e0e0e0', borderRadius: 6, background: '#fff', padding: '0 12px' },
   mergeBoxRatio: { display: 'grid', gridTemplateColumns: '1fr 3fr 1fr', alignItems: 'stretch', height: 40, gap: 0 },
 
-  cellButtonTightLeft:  { flex: 1, height: 40, border: '1px solid #e0e0e0', borderRight: 'none', borderRadius: '6px 0 0 6px', background: '#fff', fontSize: 14, cursor: 'pointer' },
+  cellButtonTightLeft:  { flex: 1, height: 40, border: '1px solid #e0e0e0', borderRadius: '6px 0 0 6px', background: '#fff', fontSize: 14, cursor: 'pointer' },
   cellButtonTightRight: { flex: 1, height: 40, border: '1px solid #e0e0e0', borderRadius: '0 6px 6px 0', background: '#fff', fontSize: 14, cursor: 'pointer' },
   cellButtonActive: { border: '2px solid #000' },
 
@@ -452,17 +426,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   marketButton: { height: 40, border: '1px solid #e0e0e0', borderRadius: 6, background: '#fff', fontSize: 14, cursor: 'pointer' },
 
   mergeFill: { width: '100%' },
-  bottomSpacer: { gridColumn: '1 / span 3', minHeight: 0, marginTop: 'auto' },
-  rowEmpty: { gridColumn: '1 / span 3', height: 8 },
 
-  rowBottom: { gridColumn: '1 / span 3', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, alignItems: 'center' },
+  rowBottom: { gridColumn: '1 / span 3', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 0, alignItems: 'center' },
   sorLabel: { fontSize: 12, color: '#666' },
   sorValue: { fontSize: 15, color: '#c2185b', textAlign: 'right', fontWeight: 600 },
 
-  row9: { gridColumn: '1 / span 3' },
-  submitWide: { width: '100%', height: 44, border: 'none', borderRadius: 8, background: '#c2185b', color: '#fff', fontSize: 16, cursor: 'pointer' },
+  row9: { gridColumn: '1 / span 3', marginLeft:'-12px', marginRight:'-12px' },
+  submitWide: { width: 'calc(100% + 0px)', height: 44, border: 'none', padding:10, background: '#c2185b', color: '#fff', fontSize: 16, cursor: 'pointer' },
 
-  /* 모달/토스트 */
   modalBackdrop: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 3000 },
   modalWrap: { position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3001, pointerEvents: 'none' },
   modalCard: { width: 420, maxWidth: '90%', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 10px 28px rgba(0,0,0,0.2)', pointerEvents: 'auto' },

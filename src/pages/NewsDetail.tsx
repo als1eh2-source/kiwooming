@@ -1,16 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 
-/**
- * NewsDetail Page Component
- * 
- * 뉴스 상세 페이지
- * - 뉴스 기사 전문 표시
- * - 북마크/공유 기능
- * - 모바일 최적화 (360-430px)
- */
 
 export const NewsDetail: React.FC = () => {
+
+useEffect(() => {
+window.scrollTo(0, 0);
+}, []);
+
 const navigate = useNavigate();
 
 const handleClose = () => {
@@ -50,14 +47,11 @@ return (
     </button>
     </div>
 
-    {/* Scrollable Content */}
     <div style={styles.scrollContainer}>
-    {/* Article Title */}
     <h2 style={styles.articleTitle}>
         큐리오시스, 청약 경쟁률 2천204대 1...증거금 7조3천억원
     </h2>
 
-    {/* Metadata Row */}
     <div style={styles.metadataRow}>
         <div style={styles.metadataLeft}>
         <span style={styles.date}>2025.11.05 16:41:56</span>
@@ -65,8 +59,19 @@ return (
         </div>
         <div style={styles.iconButtons}>
         <button onClick={handleBookmark} style={styles.iconButton} aria-label="Bookmark">
-            🔖
+        <svg
+            style={styles.icon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#666666"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-5-7 5V4a1 1 0 0 1 1-1z" />
+        </svg>
         </button>
+
         <button onClick={handleBookmark} style={styles.iconButton} aria-label="Font size">
             가
         </button>
@@ -76,16 +81,13 @@ return (
         </div>
     </div>
 
-    {/* Divider */}
     <div style={styles.divider} />
 
-    {/* Article Body */}
     <p style={{ whiteSpace: "pre-line", lineHeight: 1.6, color: "#333" }}>
     {articleText}
     </p>
     </div>
 
-    {/* Fixed Bottom Button */}
     <div style={styles.bottomButtonContainer}>
     <button onClick={handleSourceClick} style={styles.bottomButton}>
         키움증권
@@ -96,7 +98,6 @@ return (
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-// Page Container
 pageContainer: {
 width: '100%',
 margin: '0 auto',
@@ -109,7 +110,6 @@ fontFamily:
 position: 'relative',
 },
 
-// Header
 header: {
 display: 'flex',
 justifyContent: 'space-between',
@@ -139,7 +139,6 @@ alignItems: 'center',
 justifyContent: 'center',
 },
 
-// Scroll Container
 scrollContainer: {
 flex: 1,
 overflowY: 'auto',
@@ -147,7 +146,6 @@ padding: '20px',
 paddingBottom: '100px', // Space for fixed bottom button
 },
 
-// Article Title
 articleTitle: {
 margin: '0 0 16px 0',
 fontSize: '18px',
@@ -156,7 +154,6 @@ color: '#000000',
 lineHeight: '1.5',
 },
 
-// Metadata Row
 metadataRow: {
 display: 'flex',
 justifyContent: 'space-between',
@@ -195,15 +192,18 @@ display: 'flex',
 alignItems: 'center',
 justifyContent: 'center',
 },
+icon: {
+width: "20px",
+height: "20px",
+display: "block",
+},
 
-// Divider
 divider: {
 height: '1px',
 backgroundColor: '#E5E7EB',
 marginBottom: '20px',
 },
 
-// Article Body
 articleBody: {
 display: 'flex',
 flexDirection: 'column',
@@ -224,7 +224,6 @@ textAlign: 'center',
 fontWeight: 400,
 },
 
-// Fixed Bottom Button Container
 bottomButtonContainer: {
 position: 'fixed',
 bottom: 0,

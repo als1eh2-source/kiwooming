@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('계좌');
+  const [activeTab, setActiveTab] = React.useState('none');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const tabs = [
     { id: '관심종목', label: '관심종목' },
@@ -14,11 +15,19 @@ export const Footer: React.FC = () => {
     { id: '종목', label: '종목' },
   ];
 
+  
+  React.useEffect(() => {
+    const current = tabs.find(tab => tab.path === location.pathname);
+    if (current) {
+      setActiveTab(current.id);
+    }
+  }, [location.pathname]);
+  
   const handleTabClick = (tab: typeof tabs[number]) => {
     setActiveTab(tab.id);
     if (tab.path) navigate(tab.path);
   };
-
+  
   return (
     <>
       <div style={styles.indexBar}>
@@ -39,9 +48,7 @@ export const Footer: React.FC = () => {
         <span style={styles.indexPercent}>0.79%</span>
       </div>
 
-      {/* Bottom Navigation (menu 포함) */}
       <nav style={styles.bottomNav}>
-        {/* 메뉴 버튼: nav 내부 맨 왼쪽 */}
         <button style={styles.menuButtonInNav}>
           <div style={styles.menuIcon}>
             <div style={styles.menuLine}></div>
@@ -51,7 +58,6 @@ export const Footer: React.FC = () => {
           <span style={styles.menuText}>메뉴</span>
         </button>
 
-        {/* 탭 그룹: 메뉴 오른쪽으로 일렬 배치 */}
         <div style={styles.tabGroup}>
           {tabs.map((tab) => (
             <button
@@ -60,7 +66,7 @@ export const Footer: React.FC = () => {
                 ...styles.navButton,
                 ...(activeTab === tab.id ? styles.navButtonActive : {}),
               }}
-              onClick={() => handleTabClick(tab)} // ✅ 페이지 이동 적용
+              onClick={() => handleTabClick(tab)} 
             >
               {tab.label}
             </button>
@@ -89,7 +95,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     boxSizing: 'border-box',
   },
 
-  /** 탭 컨테이너: 메뉴 버튼 오른쪽 전폭 사용 */
   tabGroup: {
     display: 'flex',
     alignItems: 'center',
@@ -103,7 +108,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     scrollbarWidth: 'none',
   },
 
-  /** nav 내부용 메뉴 버튼 (고정 해제, 왼쪽 정렬) */
   menuButtonInNav: {
     position: 'static',
     width: 56,
@@ -115,7 +119,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 2,
     cursor: 'pointer',
     boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
   },
@@ -133,9 +137,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#666',
     cursor: 'pointer',
   },
-  navButtonActive: { color: '#000' },
+  navButtonActive: { color: '#000'},
 
-  /** Index Bar (footer 바로 위, 페이지 폭과 동일) */
   indexBar: {
     position: 'fixed',
     left: 0,
