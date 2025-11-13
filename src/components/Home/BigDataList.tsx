@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
 
-/**
- * BigDataList Component
- * 
- * 빅데이터 기반 주식 리스트 컴포넌트
- * - 3개 카테고리 탭: 실시간 조회, 조회수 급증, 매매 상위
- * - 순위별 종목 표시
- * - 가격 및 등락률 표시
- */
-
 interface StockData {
 id: number;
 rank: number;
@@ -22,7 +13,6 @@ type CategoryTab = '실시간 조회' | '조회수 급증' | '매매 상위';
 export const BigDataList: React.FC = () => {
 const [activeTab, setActiveTab] = useState<CategoryTab>('실시간 조회');
 
-// 카테고리별 더미 데이터
 const stockDataByCategory: Record<CategoryTab, StockData[]> = {
 '실시간 조회': [
     { id: 1, rank: 1, name: '삼성전자', price: 99900, change: -4.77 },
@@ -51,17 +41,14 @@ const currentStocks = stockDataByCategory[activeTab];
 
 const handleRefresh = () => {
 console.log('Refresh clicked');
-// TODO: 데이터 새로고침 로직
 };
 
 const handleExpand = () => {
 console.log('Expand clicked');
-// TODO: 전체보기 페이지 이동
 };
 
 const handleStockClick = (stock: StockData) => {
 console.log('Stock clicked:', stock.name);
-// TODO: 종목 상세 페이지 이동
 };
 
 const formatPrice = (price: number): string => {
@@ -75,7 +62,6 @@ return absChange.toFixed(2);
 
 return (
     <div style={styles.container}>
-        {/* 헤더 영역 */}
         <div style={styles.header}>
         <h3 style={styles.title}>빅데이터</h3>
         <div style={styles.iconGroup}>
@@ -110,7 +96,6 @@ return (
         </div>
         </div>
 
-        {/* 카테고리 탭 */}
         <div style={styles.tabContainer}>
         {(['실시간 조회', '조회수 급증', '매매 상위'] as CategoryTab[]).map(
             (tab) => (
@@ -128,7 +113,6 @@ return (
         )}
         </div>
 
-        {/* 종목 리스트 */}
         <div style={styles.stockList}>
         {currentStocks.map((stock) => (
             <div
@@ -136,13 +120,9 @@ return (
             onClick={() => handleStockClick(stock)}
             style={styles.stockRow}
             >
-            {/* 순위 */}
             <span style={styles.rank}>{stock.rank}</span>
-
-            {/* 종목명 */}
             <span style={styles.stockName}>{stock.name}</span>
 
-            {/* 가격 및 등락률 */}
             <div style={styles.priceContainer}>
                 <span style={styles.price}>{formatPrice(stock.price)}</span>
                 <span
@@ -164,7 +144,7 @@ return (
 const styles: { [key: string]: React.CSSProperties } = {
 container: {
 width: "100%",                   
-margin: "0 auto 20px auto",       // 가운데 정렬 + 아래쪽 간격
+margin: "0 auto 20px auto",       
 backgroundColor: "#FFFFFF",
 borderRadius: "16px",
 padding: "20px 16px",

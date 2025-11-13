@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
 
-/**
- * StockSearchBar Component
- * 
- * 종목 검색 바 및 연관 검색어 섹션
- * - 검색 입력창, 클리어 버튼, 음성 검색
- * - 연관 검색어 해시태그 표시
- * - 모바일 최적화 (360-430px)
- */
-
 interface Keyword {
 id: number;
 tag: string;
@@ -17,7 +8,6 @@ tag: string;
 export const StockSearchBar: React.FC = () => {
 const [searchText, setSearchText] = useState<string>('');
 
-// Dummy related keywords
 const relatedKeywords: Keyword[] = [
 { id: 1, tag: '#SK하이닉스' },
 { id: 2, tag: '#미래에셋증권' },
@@ -30,13 +20,8 @@ setSearchText(e.target.value);
 console.log('Search text:', e.target.value);
 };
 
-const handleClearClick = () => {
-setSearchText('');
-console.log('Search cleared');
-};
-
-const handleMicClick = () => {
-console.log('Voice search activated');
+const handleVoiceClick = () => {
+    console.log('Voice search clicked');
 };
 
 const handleKeywordClick = (keyword: string) => {
@@ -45,7 +30,6 @@ console.log('Keyword clicked:', keyword);
 
 return (
 <div style={styles.container}>
-    {/* Search Input Section */}
     <div style={styles.searchInputWrapper}>
     
     <input
@@ -56,19 +40,29 @@ return (
         style={styles.input}
     />
 
-    <div style={styles.rightIconsGroup}>
-        {searchText && (
-        <button onClick={handleClearClick} style={styles.iconButton}>
-            <span style={styles.clearIcon}>❌</span>
-        </button>
-        )}
-        <button onClick={handleMicClick} style={styles.iconButton}>
-        <span style={styles.micIcon}>🎤</span>
-        </button>
-    </div>
+    <button
+    onClick={handleVoiceClick}
+    style={styles.iconButton}
+    aria-label="음성 검색"
+    >
+    <svg
+        style={styles.micIcon}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#666666"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <rect x="8" y="1" width="8" height="12" rx="3" />
+        <line x1="12" y1="14" x2="12" y2="19" />
+        <path d="M5 11a7 6 0 0 0 14 0" />
+        <line x1="8" y1="19" x2="16" y2="19" />
+    </svg>
+    </button>
+
     </div>
 
-    {/* Related Keywords Section */}
     <div style={styles.keywordsSection}>
     <span style={styles.keywordsLabel}>연관검색어 :</span>
     <div style={styles.keywordsList}>
@@ -113,11 +107,6 @@ color: '#080808ff',
 outline: 'none',
 fontFamily: 'inherit',
 },
-rightIconsGroup: {
-display: 'flex',
-gap: '6px',
-alignItems: 'center',
-},
 iconButton: {
 border: 'none',
 backgroundColor: 'transparent',
@@ -132,9 +121,11 @@ fontSize: '14px',
 color: '#999999',
 },
 micIcon: {
-fontSize: '18px',
-color: '#666666',
+width: '20px',
+height: '20px',
+display: 'block',
 },
+
 keywordsSection: {
 display: 'flex',
 alignItems: 'center',

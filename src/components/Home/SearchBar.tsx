@@ -1,40 +1,50 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-/**
- * SearchBar Component
- * 
- * Android 모바일 웹 최적화 검색창 (360-430px)
- * - 둥근 모서리 디자인
- * - 왼쪽: 돋보기 아이콘
- * - 중앙: 플레이스홀더 텍스트
- * - 오른쪽: 마이크 아이콘
- */
+
 export const SearchBar: React.FC = () => {
 
 const navigate = useNavigate();
 
 const handleSearchClick = () => {
     navigate('/search');
-} // search.tsx로 이동
+} 
 
 const handleVoiceClick = () => {
     console.log('Voice search clicked');
-    // TODO: 음성 검색 기능 구현
 };
 
 return (
     <div style={styles.container}>
 <div style={styles.searchWrapper}>
-        {/* 왼쪽 돋보기 아이콘 */}
         <button
         onClick={handleSearchClick}
         style={styles.iconButton}
         aria-label="검색"
         >
-        <span style={styles.searchIcon}>🔍</span>
+        <svg
+            style={styles.searchIcon}
+            viewBox="0 0 64 64"
+        >
+            <circle
+            cx="28"
+            cy="28"
+            r="18"
+            stroke="#666666"
+            strokeWidth="6"
+            fill="none"
+            />
+            <rect
+            x="38"
+            y="38"
+            width="28"
+            height="8"
+            rx="4"
+            transform="rotate(43 43 43)"
+            fill="#666666"
+            />
+        </svg>
         </button>
 
-        {/* 중앙 검색 입력창 */}
         <input
         type="text"
         placeholder="종목·메뉴를 검색해주세요"
@@ -43,13 +53,25 @@ return (
         onFocus={handleSearchClick}
         />
 
-        {/* 오른쪽 마이크 아이콘 */}
         <button
         onClick={handleVoiceClick}
         style={styles.iconButton}
         aria-label="음성 검색"
         >
-        <span style={styles.micIcon}>🎤</span>
+        <svg
+            style={styles.micIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#666666"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect x="8" y="1" width="8" height="12" rx="3" />
+            <line x1="12" y1="14" x2="12" y2="19" />
+            <path d="M5 11a7 6 0 0 0 14 0" />
+            <line x1="8" y1="19" x2="16" y2="19" />
+        </svg>
         </button>
     </div>
     </div>
@@ -78,28 +100,23 @@ searchWrapper: {
     boxSizing: 'border-box',
 },
 iconButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: 'none',
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-    padding: '4px',
-    flexShrink: 0,
-    minWidth: '24px',
-    minHeight: '24px',
+    background: "none",
+    border: "none",
+    padding: "4px",
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
 },
 searchIcon: {
-    fontSize: '18px',
-    lineHeight: 1,
-    display: 'block',
-    color: '#666666',
+    width: "20px",
+    height: "20px",
+    display: "block",
 },
 micIcon: {
-    fontSize: '18px',
-    lineHeight: 1,
-    display: 'block',
-    color: '#666666',
+    width: "20px",
+    height: "20px",
+    display: "block",
 },
 input: {
     flex: 1,
@@ -117,7 +134,6 @@ input: {
 },
 };
 
-// Placeholder 텍스트 색상을 위한 스타일 추가
 const globalStyle = `
 input::placeholder {
     color: #999999;
@@ -137,7 +153,6 @@ color: #999999;
 }
 `;
 
-// 스타일 태그를 헤드에 추가
 if (typeof document !== 'undefined') {
 const styleId = 'search-bar-styles';
 if (!document.getElementById(styleId)) {

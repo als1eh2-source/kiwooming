@@ -1,15 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 
-/**
- * StockNewsCard Component
- * 
- * 종목뉴스 카드
- * - 최신 뉴스 목록 표시
- * - 새로고침/확장 기능
- * - 모바일 최적화 (360-430px)
- */
-
 interface NewsItem {
 id: number;
 title: string;
@@ -20,7 +11,6 @@ date: string;
 export const StockNewsCard: React.FC = () => {
 const navigate = useNavigate(); 
 
-// Mock news data
 const newsData: NewsItem[] = [
 {
     id: 1,
@@ -52,7 +42,7 @@ console.log('Expand to full news list');
 
 const handleNewsClick = (newsTitle: string, id: number) => {
 if (id === 1) {
-    navigate('/news'); // ✅ 첫 번째 뉴스 클릭 시 /news로 이동
+    navigate('/news');
 } else {
     console.log('Go to news article:', newsTitle);
 }
@@ -64,21 +54,54 @@ return (
     <div style={styles.header}>
     <h3 style={styles.title}>종목뉴스</h3>
     <div style={styles.iconGroup}>
-        <div onClick={handleRefresh} style={styles.iconButton}>
-        <span style={styles.icon}>🔄</span>
-        </div>
-        <div onClick={handleExpand} style={styles.iconButton}>
-        <span style={styles.icon}>→</span>
-        </div>
+            <button
+            onClick={handleRefresh}
+            style={styles.iconButton}
+            aria-label="새로고침"
+            >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                d="M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C12.0711 2.5 13.9462 3.33214 15.3033 4.69672"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                />
+                <path
+                d="M15 2.5V5H12.5"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                />
+            </svg>
+            </button>
+            <button
+                onClick={handleExpand}
+                style={styles.iconButton}
+                aria-label="전체 뉴스 보기"
+            >
+                <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#666666"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                >
+                <path d="M5 12h14" />
+                <path d="M13 6l6 6-6 6" />
+                </svg>
+            </button>
     </div>
     </div>
 
-    {/* News List */}
     <div style={styles.newsList}>
     {newsData.map((news, index) => (
         <React.Fragment key={news.id}>
         <div
-            onClick={() => handleNewsClick(news.title, news.id)} // ✅ id 인자 추가
+            onClick={() => handleNewsClick(news.title, news.id)}
             style={styles.newsItem}
         >
             <p style={styles.newsTitle}>{news.title}</p>
@@ -106,7 +129,6 @@ fontFamily:
     'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif',
 },
 
-// Header
 header: {
 display: 'flex',
 justifyContent: 'space-between',
@@ -130,19 +152,19 @@ padding: '4px',
 display: 'flex',
 alignItems: 'center',
 justifyContent: 'center',
+background:'transparent',
+border:"none"
 },
 icon: {
-fontSize: '16px',
-color: '#BDBDBD',
+fontSize: '22px',
+color: '#666666',
 },
 
-// News List
 newsList: {
 display: 'flex',
 flexDirection: 'column',
 },
 
-// News Item
 newsItem: {
 padding: '16px 0',
 cursor: 'pointer',
@@ -156,7 +178,6 @@ color: '#333333',
 lineHeight: '1.4',
 },
 
-// Metadata
 metadata: {
 display: 'flex',
 alignItems: 'center',
@@ -175,7 +196,6 @@ color: '#BDBDBD',
 fontWeight: 400,
 },
 
-// Divider
 divider: {
 height: '1px',
 backgroundColor: '#E5E7EB',

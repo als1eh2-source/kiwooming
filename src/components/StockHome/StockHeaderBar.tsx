@@ -11,15 +11,23 @@ const handleCloseClick = () => console.log("Close page");
 
 return (
 <div style={styles.container}>
-    {/* Left: Home */}
-    <button onClick={handleHomeClick} style={styles.iconButton}>
-    <span style={styles.icon}>🏠</span>
+    <button onClick={handleHomeClick} style={styles.iconButton} aria-label="홈으로">
+    <svg
+        style={styles.icon}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#666666"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M3 10.5L12 3l9 7.5" />
+        <path d="M5 10v10h14V10" />
+    </svg>
     </button>
 
-    {/* Center: Title */}
     <h1 style={styles.title}>종목홈</h1>
 
-    {/* Right: ⋮ + ✕ */}
     <div style={styles.rightGroup}>
     <button onClick={handleMenuClick} style={styles.iconButton}>
         <MoreVertical size={22} color="#333" />
@@ -29,7 +37,6 @@ return (
     </button>
     </div>
 
-    {/* 더보기 */}
     <MoreMenu show={showMenu} onClose={() => setShowMenu(false)}>
     <div style={styles.menuContent}>
         <div style={styles.menuItem}>
@@ -71,8 +78,9 @@ alignItems: "center",
 justifyContent: "center",
 },
 icon: {
-fontSize: "22px",
-color: "#333333",
+width: "25px",
+height: "25px",
+display: "block",
 },
 title: {
 margin: 0,
