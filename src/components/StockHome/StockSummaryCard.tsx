@@ -4,18 +4,14 @@ import { stock_home } from '../../Data/StockHome';
 import {
 AreaChart,
 Area,
-XAxis,
 YAxis,
-Tooltip,
 ResponsiveContainer,
-CartesianGrid,
 } from 'recharts';
 
 export const StockSummaryCard: React.FC = () => {
 const [isFavorite, setIsFavorite] = useState(false);
 const navigate = useNavigate();
 
-// ✅ 최근 1개월 데이터 필터
 const today = new Date();
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(today.getMonth() - 1);
@@ -38,7 +34,6 @@ const chartData = stock_home.stk_dt_pole_chart_qry
     rate: parseFloat(d.trde_tern_rt.replace('+', '')),
     }));
 
-// ✅ 최신 vs 한 달 전 비교
 const latest = chartData[chartData.length - 1];
 const oldest = chartData[0];
 const termChange = ((latest.price - oldest.price) / oldest.price) * 100;
@@ -52,17 +47,17 @@ const stock = {
     change: latest.change,
     rate: latest.rate,
     baseDate: latest.date,
-    termChange: Number(termChange.toFixed(2)), // 자동 계산된 상승률
+    termChange: Number(termChange.toFixed(2)), 
 };
 
 const handleFavoriteToggle = () => setIsFavorite(!isFavorite);
 const formatPrice = (p: number) => p.toLocaleString('ko-KR');
 
 const bottomTabs = [
-    { id: 1, icon: '💬', label: '종목톡' },
-    { id: 2, icon: '📊', label: '호가' },
-    { id: 3, icon: '📈', label: '차트' },
-    { id: 4, icon: '🔁', label: '주문' },
+    { id: 1, label: '종목톡' },
+    { id: 2, label: '호가' },
+    { id: 3, label: '차트' },
+    { id: 4, label: '주문' },
 ];
 
 const handleTabClick = (label: string) => {
@@ -74,18 +69,16 @@ const handleTabClick = (label: string) => {
 return (
     <div style={styles.outerBox}>
     <div style={styles.container}>
-        {/* 상단 설명 */}
         <div style={styles.headerSection}>
         <span style={styles.captionText}>
             통합 | {stock.code} {stock.market} | {stock.category}
         </span>
         </div>
 
-        {/* 종목명 + 가격 + 변동률 */}
         <div style={styles.namePriceColumn}>
         <div style={styles.nameRow}>
             <button onClick={handleFavoriteToggle} style={styles.favoriteButton}>
-            <span style={styles.favoriteIcon}>{isFavorite ? '⭐' : '☆'}</span>
+            <span style={styles.favoriteIcon}>{isFavorite ? '🌟' : '☆'}</span>
             </button>
             <h2 style={styles.stockName}>{stock.name}</h2>
         </div>
@@ -103,25 +96,21 @@ return (
         </div>
         </div>
 
-        {/* ✅ 부드러운 면 그래프 */}
-        <div style={{ width: '100%', height: 180 }}>
+        <div style={{ width: '100%', height: 140 }}>
         <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
             <defs>
-                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="10">
                 <stop offset="0%" stopColor="#F48FB1" stopOpacity={0.6} />
                 <stop offset="100%" stopColor="#FFFFFF" stopOpacity={0.1} />
                 </linearGradient>
             </defs>
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} />
             <YAxis hide domain={['dataMin - 2000', 'dataMax + 2000']} />
-            <Tooltip formatter={(v: number) => `${v.toLocaleString()}원`} />
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <Area
                 type="monotone"
                 dataKey="price"
                 stroke="#E91E63"
-                strokeWidth={2}
+                strokeWidth={1}
                 fill="url(#colorPrice)"
             />
             </AreaChart>
@@ -132,7 +121,6 @@ return (
         기준 : 25.{stock.baseDate}, 일봉(1개월)
         </div>
 
-        {/* ✅ 기간 및 상승률 문구 */}
         <div style={styles.periodSummary}>
         <div style={styles.periodLabel}>
             지난{' '}
@@ -153,7 +141,6 @@ return (
         </div>
         </div>
 
-        {/* 하단 탭 */}
         <div style={styles.bottomNavTabs}>
         {bottomTabs.map((tab) => (
             <button
@@ -161,7 +148,6 @@ return (
             onClick={() => handleTabClick(tab.label)}
             style={styles.navTabButton}
             >
-            <span style={styles.tabIcon}>{tab.icon}</span>
             <span style={styles.tabLabel}>{tab.label}</span>
             </button>
         ))}
@@ -171,7 +157,6 @@ return (
 );
 };
 
-// ✅ 스타일
 const styles: { [key: string]: React.CSSProperties } = {
 outerBox: {
     backgroundColor: '#fff',
@@ -185,7 +170,6 @@ container: { fontFamily: 'Noto Sans KR, sans-serif' },
 headerSection: { marginBottom: '8px' },
 captionText: { fontSize: '12px', color: '#757575' },
 
-// 🔹 종목명 + 가격 + 변동률
 namePriceColumn: {
     display: 'flex',
     flexDirection: 'column',
@@ -208,7 +192,6 @@ priceColumn: {
 mainPrice: { fontSize: '36px', fontWeight: 800, color: '#1976D2' },
 changeText: { fontSize: '15px', fontWeight: 600, marginTop: '4px' },
 
-// 🔹 그래프 + 하단 문구
 chartLabel: {
     fontSize: '12px',
     color: '#757575',
@@ -235,7 +218,6 @@ smallArrow: {
 },
 termChangeValue: { fontWeight: 700 },
 
-// 🔹 하단 탭
 bottomNavTabs: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
@@ -252,7 +234,7 @@ navTabButton: {
     cursor: 'pointer',
 },
 tabIcon: { fontSize: '20px' },
-tabLabel: { fontSize: '13px', marginTop: '2px' },
+tabLabel: { fontSize: '15px', marginTop: '2px' },
 favoriteButton: {
     border: 'none',
     background: 'transparent',

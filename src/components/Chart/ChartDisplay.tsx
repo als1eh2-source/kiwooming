@@ -23,9 +23,7 @@ const stockInfo: StkData[] = rawData.map((item: any) => ({
 export const ChartDisplay: React.FC = () => {
   return (
     <div style={styles.container}>
-      {/* 상단: 검색박스 + 돋보기 (왼쪽), 가격표시 (오른쪽) */}
       <div style={styles.selectorRow}>
-        {/* 왼쪽: 검색 영역 (박스 + 네모형 검색 버튼을 붙여서) */}
         <div style={styles.selectorGroup}>
           <div style={styles.selectorBox}>
             <div style={styles.selectorLeft}>
@@ -44,7 +42,6 @@ export const ChartDisplay: React.FC = () => {
               </div>
             </div>
 
-            {/* 드롭다운 버튼 */}
             <button style={styles.dropdownButton} aria-label="종목 선택">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M6 9L12 15L18 9" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -52,7 +49,6 @@ export const ChartDisplay: React.FC = () => {
             </button>
           </div>
 
-          {/* 네모형 검색 버튼: 검색박스와 높이 동일, 양쪽이 맞닿도록 */}
           <button style={styles.searchButtonSquare} aria-label="검색">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="8" stroke="#666" strokeWidth="2"/>
@@ -61,15 +57,12 @@ export const ChartDisplay: React.FC = () => {
           </button>
         </div>
 
-        {/* 오른쪽: 가격표시 */}
         <div style={styles.priceSection}>
-          {/* priceBox를 inline-block으로 두어, 내부 가장 넓은 줄(=282,000)에 맞춰 컨테이너가 축소됨 */}
           <div style={styles.priceBox}>
             <div style={styles.priceRow}>
               <span style={styles.currentPrice}>{stockInfo[0].cur_prc.toLocaleString()}</span>
             </div>
 
-            {/* 아래 작은 글씨 줄: 상단 텍스트(282,000)와 정확히 같은 너비 */}
             <div style={styles.subLine}>
               <span style={styles.subArrow}>{Number(stockInfo[0].pred_pre)>=0? '▲':'▼'}</span>
               <span style={styles.subChange}>{stockInfo[0].pred_pre}</span>
@@ -89,7 +82,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: 4,
   },
 
-  /* ===== 레이아웃 ===== */
   selectorRow: {
     display: 'flex',
     alignItems: 'center',
@@ -97,16 +89,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: 8,
   },
 
-  /* ===== 왼쪽: 검색 영역 ===== */
   selectorGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: 0,               // ← 간격 없이
+    gap: 0,               
     flex: 1,
     minWidth: 0,
   },
 
-  // 검색박스(왼쪽) — 오른쪽 모서리는 0, 버튼과 연결되도록
   selectorBox: {
     flex: 1,
     minWidth: 0,
@@ -115,8 +105,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     justifyContent: 'space-between',
     border: '1px solid #e0e0e0',
-    borderRight: 'none',                       // ← 버튼과 이중 보더 제거
-    borderRadius: '8px 0 0 8px',               // ← 왼쪽만 라운드
+    borderRight: 'none',                      
+    borderRadius: '8px 0 0 8px',             
     backgroundColor: '#fff',
     padding: '0 10px',
     boxSizing: 'border-box',
@@ -152,13 +142,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     justifyContent: 'center',
   },
 
-  // 검색 버튼(오른쪽) — 왼쪽 모서리 0, 검색박스와 연결되도록
   searchButtonSquare: {
     width: 40,
-    height: 50,                                  // ← 검색박스와 동일 높이
-    borderRadius: '0 8px 8px 0',                 // ← 오른쪽만 라운드
+    height: 50,                                  
+    borderRadius: '0 8px 8px 0',                 
     border: '1px solid #e0e0e0',
-    borderLeft: 'none',                           // ← 이중 보더 제거
+    borderLeft: 'none',                          
     backgroundColor: '#fff',
     display: 'flex',
     alignItems: 'center',
@@ -166,16 +155,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'pointer',
   },
 
-  /* ===== 오른쪽: 가격 영역 ===== */
   priceSection: {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
   },
 
-  // 폭을 282,000 텍스트에 '딱 맞게' 고정하기 위한 컨테이너
   priceBox: {
-    display: 'inline-block',  // ← 컨텐츠 너비만큼만 차지
+    display: 'inline-block', 
   },
 
   priceRow: {
@@ -190,7 +177,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     lineHeight: 1.0,
   },
 
-  // 아래 줄(▼ 8,500  2.93%)은 priceBox의 '100% 너비' => 위 텍스트와 정확히 동일한 폭
   subLine: {
     width: '100%',
     display: 'flex',
