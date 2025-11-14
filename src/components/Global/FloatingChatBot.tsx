@@ -24,8 +24,8 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
 
   const [visible, setVisible] = useState(true);
   const [position, setPosition] = useState<Pos>({
-    x: window.innerWidth - ICON_W -430,
-    y: window.innerHeight - ICON_H - 45,
+    x: window.innerWidth - ICON_W -560,
+    y: window.innerHeight - ICON_H - 60,
   });
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -38,6 +38,26 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
       text: "안녕하세요! 저는 키우밍이에요 🌱 함께 투자 실력을 키워볼까요?",
     },
   ]);
+
+  useEffect(() => {
+  const handleBeforeUnload = () => {
+    localStorage.removeItem("kiwooming_messages");
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      const saved = localStorage.getItem("kiwooming_messages");
+      if (saved) setMessages(JSON.parse(saved));
+    }
+  }, [isOpen]);
+
   const [input, setInput] = useState("");
 
   const offsetRef = useRef<Pos>({ x: 0, y: 0 });
@@ -73,7 +93,12 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
     };
   };
 
-  const toggleChat = () => setIsOpen((prev) => !prev);
+  const toggleChat = () => {
+    if (isOpen) {
+      localStorage.setItem("kiwooming_messages", JSON.stringify(messages));
+    }
+    setIsOpen(prev => !prev);
+  };
 
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerIdRef.current = e.pointerId;
@@ -222,17 +247,14 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
       {isOpen && (
         <div className="chat-overlay">
           <div className="chat-box">
-            <div className="chat-top">
-              {/* <img
-                src={uppart_kiwooming}
-                alt="내부 키우밍 프로필"
-                className="inner-profile-img"
-                onClick={toggleChat}
-              /> */}
-              <button className="close-btn" onClick={toggleChat}>
-                ✕
-              </button>
-            </div>
+<div className="chat-top">
+  <div className="chat-header-left">
+    <span className="chat-title">키우밍</span>
+  </div>
+
+  <button className="close-btn" onClick={toggleChat}>✕</button>
+</div>
+
 
             <div className="chat-body" ref={chatBodyRef}>
               {messages.map((msg, idx) => (
@@ -321,35 +343,46 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ onHide }) => {
       }
 
       .chat-top {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        background: transparent;
-      }
-      .profile-img {
-        width: 56px;
         height: 56px;
-        border-radius: 50%;
-        object-fit: cover;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 16px;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        position: relative;
+        z-index: 2;
+      }
+
+      .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .chat-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
       }
 
       .close-btn {
-        background: rgba(255,255,255,0.5);
+        background: none;
         border: none;
         color: #333;
-        font-size: 24px;
+        font-size: 20px;
         cursor: pointer;
         border-radius: 50%;
         width: 36px;
         height: 36px;
-        transition: 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .close-btn:hover {
-        background: rgba(255,255,255,0.8);
+        background: #e5e7eb;
       }
 
       .chat-body {
