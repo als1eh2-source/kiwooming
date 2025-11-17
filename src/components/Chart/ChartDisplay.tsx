@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import { ChartData } from '../../Data/ChartData';
+import React, { useEffect, useState } from 'react';
+// import { ChartData } from '../../Data/ChartData';
 
 interface StkData {
   dt: string;       // 날짜
@@ -9,21 +9,58 @@ interface StkData {
   trde_tern_rt: String; //변동률
 }
 
-const rawData = ChartData.stk_dt_pole_chart_qry;
+const getToday = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}${m}${day}`;
+};
 
-const stockInfo: StkData[] = rawData.map((item: any) => ({
-  dt: item.dt,
-  stk_cd: String(ChartData.stk_cd),
-  cur_prc: Number(item.cur_prc),
-  pred_pre: String(item.pred_pre), //전일 대비 가격 변동
-  trde_tern_rt: String(item.trde_tern_rt) //변동률
-}));
+// const rawData = ChartData.stk_dt_pole_chart_qry;
+
+// const stockInfo: StkData[] = rawData.map((item: any) => ({
+//   dt: item.dt,
+//   stk_cd: String(ChartData.stk_cd),
+//   cur_prc: Number(item.cur_prc),
+//   pred_pre: String(item.pred_pre), //전일 대비 가격 변동
+//   trde_tern_rt: String(item.trde_tern_rt) //변동률
+// }));
 
 
 export const ChartDisplay: React.FC = () => {
-    useEffect(() => {
+    const [stockInfo, setStockInfo] = useState<StkData[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const base_dt = getToday();
+        const url = `http://localhost:8000/chart/039490?base_dt=${base_dt}`;
+
+        const res = await fetch(url);
+        const json = await res.json();
+
+        const raw = json.stk_dt_pole_chart_qry || [];
+
+        const mapped: StkData[] = raw.map((item: any) => ({
+          dt: item.dt,
+          stk_cd: json.stk_cd,
+          cur_prc: Number(item.cur_prc),
+          pred_pre: String(item.pred_pre),
+          trde_tern_rt: String(item.trde_tern_rt)
+        }));
+
+        setStockInfo(mapped);
+      } catch (err) {
+        console.error("🔥 차트 데이터 로딩 실패:", err);
+      }
+    };
+
+    fetchData();
     window.scrollTo(0, 0);
-    }, []);
+  }, []);
+
+  if (stockInfo.length === 0) return null;
+
   return (
     <div style={styles.container}>
       <div style={styles.selectorRow}>

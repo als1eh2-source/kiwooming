@@ -1,9 +1,44 @@
-import React from 'react';
-import { getQuoteDisplayData } from '../../Data/ChartData';
+import React, { useEffect, useState } from "react";
+import axios from 'axios';
+import { symbol } from "d3-shape";
 
 export const QuoteDisplay: React.FC = () => {
-  const { code, name, nxtAvailable } = getQuoteDisplayData();
-  const codeText = nxtAvailable ? `${code} NXT거래가능` : code;
+  const SYMBOL = "039490";
+
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const API = process.env.REACT_APP_BACKEND_URL;
+        const res = await axios.get(`${API}/quote/${SYMBOL}`);
+
+        setData(res.data);
+      } catch (err) {
+        console.error(err);
+        setError("호가 정보를 불러오지 못했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuote();
+  }, []);
+
+  
+  if (loading) return <div style={{ padding: 20 }}>⏳ 불러오는 중…</div>;
+  if (error) return <div style={{ padding: 20, color: "red" }}>{error}</div>;
+  if (!data) return null;
+
+  // 수신 데이터 가공
+  const currentPrice = Math.abs(Number(data.buy_fpr_bid));
+  const askQty1 = Number(data.sel_fpr_req);
+  const bidQty1 = Number(data.buy_fpr_req);
 
   return (
     <div style={styles.container}>
@@ -23,10 +58,10 @@ export const QuoteDisplay: React.FC = () => {
               </div>
 
               <div style={styles.stockInfo}>
-                <span style={styles.stockName}>{name}</span>
+                <span style={styles.stockName}>키움증권</span>
                 <div style={styles.stockDetails}>
                   <span style={styles.badgeGreen}>상장</span>
-                  <span style={styles.stockCode}>{codeText}</span>
+                  <span style={styles.stockCode}>{SYMBOL}</span>
                 </div>
               </div>
             </div>
@@ -58,14 +93,14 @@ export const QuoteDisplay: React.FC = () => {
           {/* priceBox를 inline-block으로 두어, 내부 가장 넓은 줄(=282,000)에 맞춰 컨테이너가 축소됨 */}
           <div style={styles.priceBox}>
             <div style={styles.priceRow}>
-              <span style={styles.currentPrice}>282,000</span>
+              <span style={styles.currentPrice}>288,000</span>
             </div>
 
             {/* 아래 작은 글씨 줄: 상단 텍스트(282,000)와 정확히 같은 너비 */}
             <div style={styles.subLine}>
               <span style={styles.subArrow}>▼</span>
-              <span style={styles.subChange}>8,500</span>
-              <span style={styles.subPercent}>2.93%</span>
+              <span style={styles.subChange}>24,500</span>
+              <span style={styles.subPercent}>0.54%</span>
             </div>
           </div>
 

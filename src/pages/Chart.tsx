@@ -11,10 +11,6 @@ interface ChartProps {
 
 const Chart: React.FC<ChartProps> = ({ onShowKiwooming }) => {
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { 
-      document.body.style.overflow = "auto"; 
-    };
   }, []);
   return (
     

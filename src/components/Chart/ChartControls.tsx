@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChartData } from '../../Data/ChartData';
 
 export const ChartControls: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('일');

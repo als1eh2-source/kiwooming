@@ -1,113 +1,145 @@
 import React, { useRef, useEffect, useState } from "react";
-import { ChartData } from "../../Data/ChartData";
 
 interface CandleData {
-  dt: string;       
+  dt: string;
   open_pric: number;
   high_pric: number;
   low_pric: number;
-  cur_prc: number;   // 종가
+  cur_prc: number; 
   trde_qty: number;
 }
 
-const rawData = ChartData.stk_dt_pole_chart_qry || [];
-const Candles: CandleData[] = [...rawData]
-  .reverse()
-  .map((item: any) => ({
-    dt: String(item.dt),
-    open_pric: +item.open_pric,
-    high_pric: +item.high_pric,
-    low_pric: +item.low_pric,
-    cur_prc: +item.cur_prc,
-    trde_qty: +item.trde_qty,
-  }));
-
-// 단순 이동평균 계산
-const calcMA = (data: any[], key: keyof CandleData, period: number) => {
-  const result: number[] = [];
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      result.push(NaN);
-      continue;
-    }
-    const slice = data.slice(i - period + 1, i + 1);
-    const avg =
-      slice.reduce((sum: number, d: CandleData) => sum + (d[key] as number), 0) /
-      slice.length;
-    result.push(avg);
-  }
-  return result;
+// ⭐ 오늘 날짜 YYYYMMDD
+const getToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
 };
-
-const ma5 = calcMA(Candles, "cur_prc", 5);
-const ma10 = calcMA(Candles, "cur_prc", 10);
-const ma20 = calcMA(Candles, "cur_prc", 20);
-const ma60 = calcMA(Candles, "cur_prc", 60);
-const ma120 = calcMA(Candles, "cur_prc", 120);
-
-const prices = Candles.flatMap((c) => [c.high_pric, c.low_pric]);
-const maxPrice = Math.max(...prices);
-const minPrice = Math.min(...prices);
-
-const volumes = Candles.map((c) => c.trde_qty);
-const maxVolume = Math.max(...volumes);
-
-// 스케일러
-const PRICE_HEIGHT = 360;
-const priceTopPad = 40;
-const priceInnerH = PRICE_HEIGHT - priceTopPad - 10;
-
-const yScalePrice = (v: number) =>
-  priceTopPad + (1 - (v - minPrice) / (maxPrice - minPrice)) * priceInnerH;
-
-const VOL_HEIGHT = 160;
-const volBottomPad = 10;
-const volInnerH = VOL_HEIGHT - volBottomPad - 10;
-
-const yScaleVolume = (v: number) =>
-  10 + (1 - v / maxVolume) * volInnerH;
-
-// 색상
-const lineColors = {
-  ma5: "#ff4444",
-  ma10: "#ff9800",
-  ma20: "#4caf50",
-  ma60: "#2196F3",
-  ma120: "#9c27b0",
-};
-
-// yyyymmdd → "MM/DD"
-const prettyMD = (yyyymmdd: string) =>
-  `${yyyymmdd.slice(4, 6)}/${yyyymmdd.slice(6, 8)}`;
 
 export const ChartCanvas: React.FC = () => {
-  const [xGap] = useState(15);
+
+  // 1) 모든 Hook은 여기!
+  const [candles, setCandles] = useState<CandleData[]>([]);
+  const [xGap] = useState(10);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollRef2 = useRef<HTMLDivElement>(null);
 
-  // 현재 화면 구간 기준 최고/최저
   const [visibleHi, setVisibleHi] = useState<number | null>(null);
   const [visibleLo, setVisibleLo] = useState<number | null>(null);
   const [visibleHiIdx, setVisibleHiIdx] = useState<number | null>(null);
   const [visibleLoIdx, setVisibleLoIdx] = useState<number | null>(null);
 
-  // 드래그 스크롤 상태
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollStart, setScrollStart] = useState(0);
 
-  const svgWidth = Candles.length * xGap + 70;
-
-  // 최초 오른쪽 끝으로 이동
+  // 2) API fetch (Hook)
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const API = process.env.REACT_APP_BACKEND_URL;
+        const date = getToday();
+
+        const res = await fetch(
+          `${API}/chart/039490?base_dt=${date}`
+        );
+
+        const json = await res.json();
+
+        const raw = json.stk_dt_pole_chart_qry || [];
+        const mapped = raw
+          .map((item: any) => ({
+            dt: String(item.dt),
+            open_pric: +item.open_pric,
+            high_pric: +item.high_pric,
+            low_pric: +item.low_pric,
+            cur_prc: +item.cur_prc,
+            trde_qty: +item.trde_qty,
+          }))
+          .reverse();
+
+        setCandles(mapped);
+      } catch (err) {
+        console.error("🔥 차트 API 실패:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+    useEffect(() => {
     if (scrollRef.current && scrollRef2.current) {
       scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
       scrollRef2.current.scrollLeft = scrollRef2.current.scrollWidth;
-      updateVisibleExtremes(); 
+      updateVisibleExtremes();
     }
-  }, []);
+  }, [candles]); // ←⭐ 데이터 불러온 뒤 실행되도록 수정
 
-  // 화면 구간 내 최고/최저 계산
+  // 3) 데이터 없으면 UI만 return null (Hook은 이미 실행된 상태)
+  if (candles.length === 0) {
+    return <div style={{ height: "100%", background: "#fff" }} />;
+  }
+
+  const Candles = candles;
+
+  const calcMA = (data: any[], key: keyof CandleData, period: number) => {
+    const result: number[] = [];
+    for (let i = 0; i < data.length; i++) {
+      if (i < period - 1) {
+        result.push(NaN);
+        continue;
+      }
+      const slice = data.slice(i - period + 1, i + 1);
+      const avg =
+        slice.reduce((sum: number, d: CandleData) => sum + (d[key] as number), 0) /
+        slice.length;
+      result.push(avg);
+    }
+    return result;
+  };
+
+  const ma5 = calcMA(Candles, "cur_prc", 5);
+  const ma10 = calcMA(Candles, "cur_prc", 10);
+  const ma20 = calcMA(Candles, "cur_prc", 20);
+  const ma60 = calcMA(Candles, "cur_prc", 60);
+  const ma120 = calcMA(Candles, "cur_prc", 120);
+
+  const prices = Candles.flatMap((c) => [c.high_pric, c.low_pric]);
+  const maxPrice = Math.max(...prices);
+  const minPrice = Math.min(...prices);
+
+  const volumes = Candles.map((c) => c.trde_qty);
+  const maxVolume = Math.max(...volumes);
+
+  const PRICE_HEIGHT = 360;
+  const priceTopPad = 40;
+  const priceInnerH = PRICE_HEIGHT - priceTopPad - 10;
+
+  const yScalePrice = (v: number) =>
+    priceTopPad + (1 - (v - minPrice) / (maxPrice - minPrice)) * priceInnerH;
+
+  const VOL_HEIGHT = 160;
+  const volBottomPad = 10;
+  const volInnerH = VOL_HEIGHT - volBottomPad - 30;
+
+const VOL_SCALE = 0.4; // 1.3~2.0 추천
+const yScaleVolume = (v: number) =>
+  10 + (1 - (v / maxVolume) ** VOL_SCALE) * volInnerH;
+
+
+
+  const lineColors = {
+    ma5: "#ff4444",
+    ma10: "#ff9800",
+    ma20: "#4caf50",
+    ma60: "#2196F3",
+    ma120: "#9c27b0",
+  };
+
+  const prettyMD = (yyyymmdd: string) =>
+    `${yyyymmdd.slice(4, 6)}/${yyyymmdd.slice(6, 8)}`;
+
+  const svgWidth = Candles.length * xGap + 70;
+
   const updateVisibleExtremes = () => {
     if (!scrollRef.current) return;
     const scrollLeft = scrollRef.current.scrollLeft;
@@ -141,7 +173,6 @@ export const ChartCanvas: React.FC = () => {
     setVisibleLoIdx(loIdx);
   };
 
-  // 스크롤 동기화
   const syncScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (!scrollRef.current || !scrollRef2.current) return;
     if (e.currentTarget === scrollRef.current) {
@@ -178,6 +209,7 @@ export const ChartCanvas: React.FC = () => {
   const xAt = (i: number) => 40 + i * xGap;
 
   return (
+
     <div
       style={{ ...styles.container, cursor: isDragging ? "grabbing" : "grab" }}
       onMouseDown={handleMouseDown}
@@ -236,6 +268,7 @@ export const ChartCanvas: React.FC = () => {
             const close = yScalePrice(c.cur_prc);
             const bodyTop = Math.min(open, close);
             const bodyH = Math.max(Math.abs(open - close), 2);
+            const candleWidth = xGap * 0.8;
             return (
               <g key={i}>
                 <line
@@ -247,9 +280,9 @@ export const ChartCanvas: React.FC = () => {
                   strokeWidth="1.2"
                 />
                 <rect
-                  x={x - xGap / 4}
+                  x={x - candleWidth / 2}
                   y={bodyTop}
-                  width={xGap / 2}
+                  width={candleWidth}
                   height={bodyH}
                   fill={isRise ? "#ff4444" : "#2196F3"}
                   stroke="#fff"
@@ -334,12 +367,13 @@ export const ChartCanvas: React.FC = () => {
             const isRise = c.cur_prc >= c.open_pric;
             const y = yScaleVolume(c.trde_qty);
             const h = VOL_HEIGHT - volBottomPad - y;
+            const volWidth = xGap * 0.8;
             return (
               <rect
                 key={i}
-                x={x - xGap / 4}
+                x={x - volWidth / 2}
                 y={y}
-                width={xGap / 2}
+                width={volWidth}
                 height={h}
                 fill={isRise ? "#ff4444" : "#2196F3"}
                 opacity="0.85"
@@ -399,7 +433,7 @@ const styles: { [k: string]: React.CSSProperties } = {
     right: 0,
     top: 30,
     width: 60,
-    height: PRICE_HEIGHT,
+    height: 360,
     background: "transparent",
     pointerEvents: "none",
     zIndex: 10,

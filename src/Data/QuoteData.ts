@@ -10,71 +10,78 @@ export interface LadderRow {
 // 1) 원본 키움 응답(사용자 제공)
 // ───────────────────────────────────────────────────────────
 const RAW = {
-  bid_req_base_tm: "113930",
-  sel_10th_pre_req_pre: "0",
-  sel_10th_pre_req: "17276",
-  sel_10th_pre_bid: "+105300",
-  sel_9th_pre_req_pre: "0",
-  sel_9th_pre_req: "15405",
-  sel_9th_pre_bid: "+105200",
-  sel_8th_pre_req_pre: "0",
-  sel_8th_pre_req: "17930",
-  sel_8th_pre_bid: "+105100",
-  sel_7th_pre_req_pre: "0",
-  sel_7th_pre_req: "57177",
-  sel_7th_pre_bid: "+105000",
-  sel_6th_pre_req_pre: "0",
-  sel_6th_pre_req: "18708",
-  sel_6th_pre_bid: "+104900",
-  sel_5th_pre_req_pre: "0",
-  sel_5th_pre_req: "19002",
-  sel_5th_pre_bid: "+104800",
-  sel_4th_pre_req_pre: "0",
-  sel_4th_pre_req: "15511",
-  sel_4th_pre_bid: "+104700",
-  sel_3th_pre_req_pre: "0",
-  sel_3th_pre_req: "18242",
-  sel_3th_pre_bid: "+104600",
-  sel_2th_pre_req_pre: "0",
-  sel_2th_pre_req: "54417",
-  sel_2th_pre_bid: "+104500",
-  sel_1th_pre_req_pre: "--6",
-  sel_fpr_req: "2044",
-  sel_fpr_bid: "+104400",
-  buy_fpr_bid: "+104300",
-  buy_fpr_req: "28009",
-  buy_1th_pre_req_pre: "--33",
-  buy_2th_pre_bid: "+104200",
-  buy_2th_pre_req: "26526",
-  buy_2th_pre_req_pre: "0",
-  buy_3th_pre_bid: "+104100",
-  buy_3th_pre_req: "14363",
-  buy_3th_pre_req_pre: "0",
-  buy_4th_pre_bid: "+104000",
-  buy_4th_pre_req: "15688",
-  buy_4th_pre_req_pre: "0",
-  buy_5th_pre_bid: "+103900",
-  buy_5th_pre_req: "6251",
-  buy_5th_pre_req_pre: "0",
-  buy_6th_pre_bid: "+103800",
-  buy_6th_pre_req: "6073",
-  buy_6th_pre_req_pre: "0",
-  buy_7th_pre_bid: "+103700",
-  buy_7th_pre_req: "17155",
-  buy_7th_pre_req_pre: "0",
-  buy_8th_pre_bid: "+103600",
-  buy_8th_pre_req: "18113",
-  buy_8th_pre_req_pre: "0",
-  buy_9th_pre_bid: "+103500",
-  buy_9th_pre_req: "37391",
-  buy_9th_pre_req_pre: "+20",
-  buy_10th_pre_bid: "+103400",
-  buy_10th_pre_req: "18255",
-  buy_10th_pre_req_pre: "0",
-  tot_sel_req_jub_pre: "--6",
-  tot_sel_req: "235712",
-  tot_buy_req: "187824",
-} as const;
+  "bid_req_base_tm": "160000",
+  "sel_10th_pre_req_pre": "0",
+  "sel_10th_pre_req": "305",
+  "sel_10th_pre_bid": "-293000",
+  "sel_9th_pre_req_pre": "0",
+  "sel_9th_pre_req": "219",
+  "sel_9th_pre_bid": "-292500",
+  "sel_8th_pre_req_pre": "0",
+  "sel_8th_pre_req": "617",
+  "sel_8th_pre_bid": "-292000",
+  "sel_7th_pre_req_pre": "0",
+  "sel_7th_pre_req": "710",
+  "sel_7th_pre_bid": "-291500",
+  "sel_6th_pre_req_pre": "0",
+  "sel_6th_pre_req": "217",
+  "sel_6th_pre_bid": "-291000",
+  "sel_5th_pre_req_pre": "0",
+  "sel_5th_pre_req": "132",
+  "sel_5th_pre_bid": "-290500",
+  "sel_4th_pre_req_pre": "0",
+  "sel_4th_pre_req": "888",
+  "sel_4th_pre_bid": "-290000",
+  "sel_3th_pre_req_pre": "0",
+  "sel_3th_pre_req": "410",
+  "sel_3th_pre_bid": "-289500",
+  "sel_2th_pre_req_pre": "0",
+  "sel_2th_pre_req": "481",
+  "sel_2th_pre_bid": "-289000",
+  "sel_1th_pre_req_pre": "0",
+  "sel_fpr_req": "259",
+  "sel_fpr_bid": "-288500",
+  "buy_fpr_bid": "-288000",
+  "buy_fpr_req": "1550",
+  "buy_1th_pre_req_pre": "0",
+  "buy_2th_pre_bid": "-287500",
+  "buy_2th_pre_req": "408",
+  "buy_2th_pre_req_pre": "0",
+  "buy_3th_pre_bid": "-287000",
+  "buy_3th_pre_req": "1007",
+  "buy_3th_pre_req_pre": "0",
+  "buy_4th_pre_bid": "-286500",
+  "buy_4th_pre_req": "384",
+  "buy_4th_pre_req_pre": "0",
+  "buy_5th_pre_bid": "-286000",
+  "buy_5th_pre_req": "510",
+  "buy_5th_pre_req_pre": "0",
+  "buy_6th_pre_bid": "-285500",
+  "buy_6th_pre_req": "208",
+  "buy_6th_pre_req_pre": "0",
+  "buy_7th_pre_bid": "-285000",
+  "buy_7th_pre_req": "668",
+  "buy_7th_pre_req_pre": "0",
+  "buy_8th_pre_bid": "-284500",
+  "buy_8th_pre_req": "75",
+  "buy_8th_pre_req_pre": "0",
+  "buy_9th_pre_bid": "-284000",
+  "buy_9th_pre_req": "106",
+  "buy_9th_pre_req_pre": "0",
+  "buy_10th_pre_bid": "-283500",
+  "buy_10th_pre_req": "90",
+  "buy_10th_pre_req_pre": "0",
+  "tot_sel_req_jub_pre": "0",
+  "tot_sel_req": "4238",
+  "tot_buy_req": "5006",
+  "tot_buy_req_jub_pre": "0",
+  "ovt_sel_req_pre": "0",
+  "ovt_sel_req": "0",
+  "ovt_buy_req": "103",
+  "ovt_buy_req_pre": "0",
+  "return_code": 0,
+  "return_msg": "정상적으로 처리되었습니다"
+}
 
 // ───────────────────────────────────────────────────────────
 // 2) 유틸: 문자열 파싱
@@ -85,7 +92,13 @@ const toNumber = (v?: string | number): number => {
   return Number.isFinite(n) ? n : 0;
 };
 
-const toPrice = (s?: string): number => toNumber(s);
+const toPrice = (s?: string): number => {
+  if (!s) return 0;
+  // 숫자만 추출해서 실제 가격만 사용
+  const num = Number(s.replace(/[^\d]/g, ""));
+  return Number.isFinite(num) ? num : 0;
+};
+
 
 // ───────────────────────────────────────────────────────────
 // 3) 중심호가(현재가 대용) & 고정 구간 정의
@@ -94,7 +107,7 @@ const toPrice = (s?: string): number => toNumber(s);
 //    - 상단은 sel_10th_pre_bid(+105300), 하단은 buy_10th_pre_bid(+103400)
 // ───────────────────────────────────────────────────────────
 export const currentPrice: number = toPrice(RAW.sel_fpr_bid) || 104400;
-const STEP = 100;
+const STEP = 500;
 
 const TOP_PRICE = toPrice(RAW.sel_10th_pre_bid) || (currentPrice + 900);
 const BOTTOM_PRICE = toPrice(RAW.buy_10th_pre_bid) || (currentPrice - 900);

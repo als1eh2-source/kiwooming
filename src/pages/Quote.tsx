@@ -29,7 +29,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
     backgroundColor: '#fff',
-    maxWidth: '430px',
+    width: '100%',
     margin: '0 auto',
     position: 'relative',
     paddingBottom: 0,

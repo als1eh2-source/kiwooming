@@ -52,12 +52,12 @@ export const OrderDisplay: React.FC = () => {
         <div style={styles.priceSection}>
           <div style={styles.priceBox}>
             <div style={styles.priceRow}>
-              <span style={styles.currentPrice}>282,000</span>
+              <span style={styles.currentPrice}>288,000</span>
             </div>
             <div style={styles.subLine}>
               <span style={styles.subArrow}>▼</span>
-              <span style={styles.subChange}>0</span>
-              <span style={styles.subPercent}>0.02%</span>
+              <span style={styles.subChange}>24,500</span>
+              <span style={styles.subPercent}>0.54%</span>
             </div>
           </div>
         </div>

@@ -284,12 +284,51 @@ export const OrderForm: React.FC = () => {
         </div>{/* orderEntrySection 끝 */}
       </div>{/* mainContent */}
 
-      {/* 모달 */}
-      {/* (원본 그대로 유지) */}
+      {/* 확인 모달 (showConfirm) */}
+      {showConfirm && (
+        <>
+          <div style={styles.modalBackdrop} onClick={() => setShowConfirm(false)} />
+          <div style={styles.modalWrap} role="dialog" aria-modal="true" aria-labelledby="orderConfirmTitle">
+            <div style={styles.modalCard}>
+              <div style={styles.modalHeader}>
+                <h3 id="orderConfirmTitle" style={styles.modalTitle}>현금 매수 주문 확인</h3>
+              </div>
+              <div style={styles.modalDivider} />
+              <div style={styles.modalTable}>
+                <div style={styles.modalRow}><div style={styles.modalTh}>종목명</div><div style={styles.modalTd}>{SYMBOL}</div></div>
+                <div style={styles.modalRow}><div style={styles.modalTh}>매매종류</div><div style={styles.modalTd}>{priceType}</div></div>
+                <div style={styles.modalRow}><div style={styles.modalTh}>주문수량</div><div style={styles.modalTd}>{quantity.toLocaleString()}주</div></div>
+                <div style={styles.modalRow}><div style={styles.modalTh}>주문가격</div><div style={{ ...styles.modalTd, background: '#fff7cc' }}>{price.toLocaleString()}원</div></div>
+                <div style={styles.modalRow}><div style={styles.modalTh}>총 주문금액</div><div style={{ ...styles.modalTd, fontWeight: 700 }}>{(price * quantity).toLocaleString()}원</div></div>
+                <div style={styles.modalRow}><div style={styles.modalTh}>거래소</div><div style={styles.modalTd}>SOR (스마트주문)</div></div>
+              </div>
+              <div style={styles.modalFooter}>
+                <button style={styles.modalCancel} onClick={() => setShowConfirm(false)}>취소</button>
+                <button style={styles.modalOk} onClick={handleConfirm}>확인</button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
-      {/* 토스트 */}
-      {/* (원본 그대로 유지) */}
-
+      {/* 상단/하단 토스트 */}
+      {showToast && (
+        <>
+          {/* 위쪽: 매수 체결 */}
+          <div style={styles.toastTop}>
+            <span style={styles.toastTitle}>매수 체결 [KRX]</span>
+            <div style={styles.toastInfoRow}>
+              <span style={styles.toastSymbol}>{SYMBOL}</span>
+              <span style={styles.toastPrice}>{(price*quantity).toLocaleString()}원</span>
+              <span style={styles.toastQty}>{quantity.toLocaleString()}주</span>
+            </div>
+          </div>
+          {/* 아래쪽: 주문 완료 */}
+          <div style={styles.toastBottom}>
+            <span style={styles.toastFooter}>KRX 매수주문이 완료되었습니다.</span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -622,4 +661,59 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: 16,
     borderRadius: 6,
   },
+
+  /* 모달/토스트 */
+  modalBackdrop: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 3000 },
+  modalWrap: { position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3001, pointerEvents: 'none' },
+  modalCard: { width: 420, maxWidth: '90%', background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 10px 28px rgba(0,0,0,0.2)', pointerEvents: 'auto' },
+  modalHeader: { padding: '14px 16px', background: '#ffe6ea' },
+  modalTitle: { margin: 0, fontSize: 18, color: '#c2185b', fontWeight: 700, textAlign: 'center' },
+  modalDivider: { height: 1, background: '#e5e5e5' },
+  modalTable: { padding: '12px 14px' },
+  modalRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid #f1f1f1' },
+  modalTh: { padding: '12px 10px', background: '#fafafa', color: '#333', fontSize: 14 },
+  modalTd: { padding: '12px 10px', color: '#111', fontSize: 14 },
+  modalFooter: { display: 'grid', gridTemplateColumns: '1fr 1fr' },
+  modalCancel: { height: 48, border: 'none', background: '#eeeeee', color: '#333', fontSize: 16, cursor: 'pointer' },
+  modalOk: { height: 48, border: 'none', background: '#e36a93', color: '#fff', fontSize: 16, cursor: 'pointer' },
+
+  toastTop: {
+    position: 'fixed',
+    top: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 300,
+    background: '#c2185b',
+    color: '#fff',
+    borderRadius: 10,
+    boxShadow: '0 6px 16px rgba(0,0,0,0.25)',
+    padding: '10px 12px',
+    textAlign: 'left',
+    fontSize: 15,
+    fontWeight: 700,
+    zIndex: 4000,
+  },
+  toastTitle: { display: 'block', fontSize: 15, fontWeight: 800, marginBottom: 6 },
+  toastInfoRow: { display: 'grid', gridTemplateColumns: '1fr auto auto', alignItems: 'center', columnGap: 16 },
+  toastSymbol: { justifySelf: 'start', fontSize: 14, fontWeight: 600 },
+  toastPrice: { justifySelf: 'center', fontSize: 14, fontWeight: 600 },
+  toastQty: { justifySelf: 'end', fontSize: 14, fontWeight: 700 },
+  toastBottom: {
+    position: 'fixed',
+    bottom: 60,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: 'rgba(50,50,50,0.5)',
+    color: '#fff',
+    borderRadius: 12,
+    padding: '8px 14px',
+    textAlign: 'center',
+    fontSize: 13,
+    fontWeight: 600,
+    zIndex: 4000,
+    display: 'inline-block',
+    width: 'auto',
+    whiteSpace: 'nowrap',
+  },
+  toastFooter: { fontSize: 13, fontWeight: 600, color: '#fff' },
 };

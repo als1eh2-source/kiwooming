@@ -11,12 +11,8 @@ import { Footer } from '../components/Global/Footer';
 export default function Quote() {
   const { symbol } = useParams<{ symbol?: string }>();
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { 
-      document.body.style.overflow = "auto"; 
-    };
-  }, []);
+useEffect(() => {
+}, []);
 
   return (
     <div style={styles.container}>
@@ -37,7 +33,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: {
     minHeight: '100vh',
     backgroundColor: '#fff',
-    maxWidth: '430px',
+    width: '100%',
     margin: '0 auto',
     position: 'relative',
     display: 'flex',

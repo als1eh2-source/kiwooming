@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { stock_home } from '../../Data/StockHome';
+
 import {
 AreaChart,
 Area,
@@ -9,30 +9,59 @@ ResponsiveContainer,
 } from 'recharts';
 
 export const StockSummaryCard: React.FC = () => {
-const [isFavorite, setIsFavorite] = useState(false);
-const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [chartDataRaw, setChartDataRaw] = useState<any[]>([]);
+    const navigate = useNavigate();
+    const API = process.env.REACT_APP_BACKEND_URL;
+    const code = "039490";
 
-const today = new Date();
-const oneMonthAgo = new Date();
-oneMonthAgo.setMonth(today.getMonth() - 1);
+    const today = new Date();
+    const baseDt = today.toISOString().slice(0, 10).replace(/-/g, '');
+  
+  // 🔥 1) mount 되면 차트 데이터 fetch
+  useEffect(() => {
+    async function fetchChart() {
+      try {
+        const url = `${API}/chart/${code}?base_dt=${baseDt}`;
+        console.log("📡 Fetch chart:", url);
 
-const chartData = stock_home.stk_dt_pole_chart_qry
-    .filter((d) => {
-    const dateStr = d.dt;
-    const dateObj = new Date(
-        parseInt(dateStr.slice(0, 4)),
-        parseInt(dateStr.slice(4, 6)) - 1,
-        parseInt(dateStr.slice(6, 8))
-    );
-    return dateObj >= oneMonthAgo;
-    })
-    .reverse()
-    .map((d) => ({
-    date: `${d.dt.slice(4, 6)}/${d.dt.slice(6, 8)}`,
-    price: Number(d.cur_prc),
-    change: Number(d.pred_pre),
-    rate: parseFloat(d.trde_tern_rt.replace('+', '')),
-    }));
+        const res = await fetch(url);
+        const json = await res.json();
+        setChartDataRaw(json.stk_dt_pole_chart_qry || []);
+      } catch (e) {
+        console.error("❌ Chart fetch error:", e);
+      }
+    }
+
+    fetchChart();
+  }, []);
+
+  // 🔥 2) 유효한 데이터 없으면 로딩 UI
+  if (chartDataRaw.length === 0) {
+    return <div style={{ padding: 20 }}>⏳ 차트 데이터를 불러오는 중입니다...</div>;
+  }
+
+    // 🔥 3) 1개월 데이터 필터링 (백엔드 실제 데이터 사용)
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    const chartData = chartDataRaw
+        .filter((d) => {
+            const dateStr = d.dt;
+            const dateObj = new Date(
+                parseInt(dateStr.slice(0, 4)),
+                parseInt(dateStr.slice(4, 6)) - 1,
+                parseInt(dateStr.slice(6, 8))
+            );
+            return dateObj >= oneMonthAgo;
+        })
+        .reverse()
+        .map((d) => ({
+            date: `${d.dt.slice(4, 6)}/${d.dt.slice(6, 8)}`,
+            price: Number(d.cur_prc),
+            change: Number(d.pred_pre),
+            rate: parseFloat(d.trde_tern_rt?.replace('+', '') || '0'),
+        }));
 
 const latest = chartData[chartData.length - 1];
 const oldest = chartData[0];
@@ -40,7 +69,7 @@ const termChange = ((latest.price - oldest.price) / oldest.price) * 100;
 
 const stock = {
     name: '키움증권',
-    code: stock_home.stk_cd,
+    code: code,
     market: 'KOSPI',
     category: 'NXT거래가능',
     price: latest.price,
